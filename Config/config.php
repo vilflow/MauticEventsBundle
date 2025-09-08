@@ -37,6 +37,34 @@ return [
                 'method'     => 'DELETE',
             ],
         ],
+        'api' => [
+            'mautic_api_eventsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'events',
+                'path'            => '/events',
+                'controller'      => MauticPlugin\MauticEventsBundle\Controller\Api\EventApiController::class,
+            ],
+            'mautic_api_event_contacts' => [
+                'path'       => '/events/{id}/contacts',
+                'controller' => 'MauticPlugin\\MauticEventsBundle\\Controller\\Api\\EventApiController::getContactsAction',
+                'method'     => 'GET',
+            ],
+            'mautic_api_event_contacts_search' => [
+                'path'       => '/events/{id}/contacts/search',
+                'controller' => 'MauticPlugin\\MauticEventsBundle\\Controller\\Api\\EventApiController::searchContactsAction',
+                'method'     => 'GET',
+            ],
+            'mautic_api_event_contacts_attach' => [
+                'path'       => '/events/{id}/contacts/attach',
+                'controller' => 'MauticPlugin\\MauticEventsBundle\\Controller\\Api\\EventApiController::attachContactsAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_event_contacts_detach' => [
+                'path'       => '/events/{id}/contacts/{contactId}/detach',
+                'controller' => 'MauticPlugin\\MauticEventsBundle\\Controller\\Api\\EventApiController::detachContactAction',
+                'method'     => 'DELETE',
+            ],
+        ],
     ],
 
     'menu' => [

@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticEventsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -107,6 +108,30 @@ class Event extends CommonEntity
     {
         $metadata->addPropertyConstraint('eventExternalId', new NotBlank(['message' => 'mautic.events.event_external_id.required']));
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.events.name.required']));
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
+    {
+        $metadata->setGroupPrefix('event')
+            ->addListProperties([
+                'id',
+                'eventExternalId',
+                'name',
+                'website',
+                'currency',
+                'country',
+                'city',
+                'registrationUrl',
+                'suitecrmId',
+            ])
+            ->addProperties([
+                'createdAt',
+                'updatedAt',
+            ])
+            ->build();
     }
 
     public function __construct()
