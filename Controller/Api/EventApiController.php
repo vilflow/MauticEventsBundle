@@ -76,17 +76,60 @@ class EventApiController extends CommonApiController
      */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
-        if (isset($parameters['event_external_id']) && !isset($parameters['eventExternalId'])) {
-            $parameters['eventExternalId'] = $parameters['event_external_id'];
-            unset($parameters['event_external_id']);
-        }
-        if (isset($parameters['registration_url']) && !isset($parameters['registrationUrl'])) {
-            $parameters['registrationUrl'] = $parameters['registration_url'];
-            unset($parameters['registration_url']);
-        }
-        if (isset($parameters['suitecrm_id']) && !isset($parameters['suitecrmId'])) {
-            $parameters['suitecrmId'] = $parameters['suitecrm_id'];
-            unset($parameters['suitecrm_id']);
+        // Define snake_case to camelCase mapping for all fields
+        $fieldMapping = [
+            'event_external_id' => 'eventExternalId',
+            'event_program_url_c' => 'eventProgramUrlC',
+            'history_url_c' => 'historyUrlC',
+            'event_speakers_url_c' => 'eventSpeakersUrlC',
+            'submission_url_c' => 'submissionUrlC',
+            'event_faq_url_c' => 'eventFaqUrlC',
+            'event_venue_url_c' => 'eventVenueUrlC',
+            'visa_url_c' => 'visaUrlC',
+            'registration_url_c' => 'registrationUrlC',
+            'event_facebook_url_c' => 'eventFacebookUrlC',
+            'event_feedback_url_c' => 'eventFeedbackUrlC',
+            'event_testimonials_url_c' => 'eventTestimonialsUrlC',
+            'website_url_c' => 'websiteUrlC',
+            'easy_payment_url_c' => 'easyPaymentUrlC',
+            'decline_redirect' => 'declineRedirect',
+            'accept_redirect' => 'acceptRedirect',
+            'event_manager_email_c' => 'eventManagerEmailC',
+            'isbn_number_c' => 'isbnNumberC',
+            'event_wire_transfer_data_c' => 'eventWireTransferDataC',
+            'about_event_c' => 'aboutEventC',
+            'duration_minutes' => 'durationMinutes',
+            'duration_hours' => 'durationHours',
+            'abstract_book_image_c' => 'abstractBookImageC',
+            'date_end' => 'dateEnd',
+            'date_start' => 'dateStart',
+            'date_modified' => 'dateModified',
+            'date_entered' => 'dateEntered',
+            'early_bird_reg_deadline_c' => 'earlyBirdRegDeadlineC',
+            'event_start_date_c' => 'eventStartDateC',
+            'submission_deadline_c' => 'submissionDeadlineC',
+            'event_end_date_c' => 'eventEndDateC',
+            'early_reg_deadline_c' => 'earlyRegDeadlineC',
+            'final_reg_deadline_c' => 'finalRegDeadlineC',
+            'currency_id' => 'currencyId',
+            'event_organizer_c' => 'eventOrganizerC',
+            'event_round_c' => 'eventRoundC',
+            'event_manager_name_c' => 'eventManagerNameC',
+            'event_city_c' => 'eventCityC',
+            'event_field_c' => 'eventFieldC',
+            'event_country_c' => 'eventCountryC',
+            'activity_status_type' => 'activityStatusType',
+            'invite_templates' => 'inviteTemplates',
+            'created_at' => 'createdAt',
+            'updated_at' => 'updatedAt',
+        ];
+
+        // Convert snake_case parameters to camelCase
+        foreach ($fieldMapping as $snakeCase => $camelCase) {
+            if (isset($parameters[$snakeCase]) && !isset($parameters[$camelCase])) {
+                $parameters[$camelCase] = $parameters[$snakeCase];
+                unset($parameters[$snakeCase]);
+            }
         }
 
         return parent::prepareParametersForBinding($request, $parameters, $entity, $action);

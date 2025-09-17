@@ -128,7 +128,7 @@
                             <td>
                                 <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
                                 {% if item.getDescription() %}
-                                    <br><small class="text-muted">{{ item.getDescription()|striptags|truncate(50) }}</small>
+                                    <br><small class="text-muted">{{ item.getDescription()|striptags|slice(0, 50) }}{% if item.getDescription()|striptags|length > 50 %}...{% endif %}</small>
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">
