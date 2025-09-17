@@ -29,22 +29,22 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="detail-item mb-8 mt-8">
+                            <div class="detail-item mb-3">
                                 <label class="detail-label">{% trans %}mautic.core.id{% endtrans %}</label>
                                 <div class="detail-value">
                                     <span class="label label-default">#{{ event.getId() }}</span>
                                 </div>
                             </div>
-                            
-                            <div class="detail-item mb-8 mt-8">
+
+                            <div class="detail-item mb-3">
                                 <label class="detail-label">{% trans %}mautic.events.name{% endtrans %}</label>
                                 <div class="detail-value">
                                     <strong>{{ event.getName() }}</strong>
                                 </div>
                             </div>
-                            
+
                             {% if event.getEventExternalId() %}
-                            <div class="detail-item mb-8 mt-8">
+                            <div class="detail-item mb-3">
                                 <label class="detail-label">{% trans %}mautic.events.event_external_id{% endtrans %}</label>
                                 <div class="detail-value">
                                     <code>{{ event.getEventExternalId() }}</code>
@@ -52,40 +52,84 @@
                             </div>
                             {% endif %}
 
+                            {% if event.getDescription() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Description</label>
+                                <div class="detail-value">{{ event.getDescription()|nl2br }}</div>
+                            </div>
+                            {% endif %}
 
-                            {% if event.getCity() %}
-                                <div class="detail-item mb-8 mt-8">
-                                    <label class="detail-label">{% trans %}mautic.events.city{% endtrans %}</label>
-                                    <div class="detail-value">{{ event.getCity() }}</div>
-                                </div>
+                            {% if event.getAboutEventC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">About Event</label>
+                                <div class="detail-value">{{ event.getAboutEventC()|nl2br }}</div>
+                            </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="col-md-6">
-                            {% if event.getCurrency() %}
-                            <div class="detail-item mb-8 mt-8">
-                                <label class="detail-label">{% trans %}mautic.events.currency{% endtrans %}</label>
+                            {% if event.getEventOrganizerC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Event Organizer</label>
                                 <div class="detail-value">
-                                    <i class="fa fa-money mr-1"></i>
-                                    {{ event.getCurrency() }}
+                                    <i class="fa fa-user mr-1"></i>
+                                    {{ event.getEventOrganizerC() }}
                                 </div>
                             </div>
                             {% endif %}
-                            
-                            {% if event.getSuitecrmId() %}
-                                <div class="detail-item mb-8 mt-8">
-                                    <label class="detail-label">{% trans %}mautic.events.suitecrm_id{% endtrans %}</label>
-                                    <div class="detail-value">
-                                        <code>{{ event.getSuitecrmId() }}</code>
-                                    </div>
+
+                            {% if event.getEventRoundC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Event Round</label>
+                                <div class="detail-value">
+                                    <span class="label label-info">{{ event.getEventRoundC() }}</span>
                                 </div>
+                            </div>
                             {% endif %}
 
-                            {% if event.getCountry() %}
-                                <div class="detail-item mt-8 pt-8">
-                                    <label class="detail-label">{% trans %}mautic.events.country{% endtrans %}</label>
-                                    <div class="detail-value">{{ event.getCountry() }}</div>
+                            {% if event.getEventManagerNameC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Event Manager Name</label>
+                                <div class="detail-value">{{ event.getEventManagerNameC()|replace({'_': ' '}) }}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getEventCityC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Event City</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-map-marker mr-1"></i>
+                                    {{ event.getEventCityC() }}
                                 </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getEventCountryC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Event Country</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-globe mr-1"></i>
+                                    {{ event.getEventCountryC()|replace({'_': ' '}) }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getEventFieldC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Event Field</label>
+                                <div class="detail-value">
+                                    <span class="label label-success">{{ event.getEventFieldC()|replace({'_': ' '}) }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getActivityStatusType() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Activity Status</label>
+                                <div class="detail-value">
+                                    <span class="label label-{{ event.getActivityStatusType() == 'active' ? 'success' : 'warning' }}">{{ event.getActivityStatusType()|title }}</span>
+                                </div>
+                            </div>
                             {% endif %}
                         </div>
                     </div>
@@ -94,6 +138,124 @@
 
 
 
+
+            <!-- Event Dates & Times Card -->
+            <div class="panel panel-primary mb-3">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-clock-o mr-2"></i>
+                        Event Schedule
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if event.getDateStart() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Start Date</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-calendar-o mr-1"></i>
+                                    {{ event.getDateStart()|date('Y-m-d H:i') }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getDateEnd() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">End Date</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-calendar-o mr-1"></i>
+                                    {{ event.getDateEnd()|date('Y-m-d H:i') }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getDurationHours() or event.getDurationMinutes() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Duration</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-hourglass-half mr-1"></i>
+                                    {% if event.getDurationHours() %}{{ event.getDurationHours() }}h {% endif %}
+                                    {% if event.getDurationMinutes() %}{{ event.getDurationMinutes() }}m{% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {% if event.getEarlyBirdRegDeadlineC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Early Bird Deadline</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    {{ event.getEarlyBirdRegDeadlineC()|date('Y-m-d') }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getFinalRegDeadlineC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Final Registration Deadline</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    {{ event.getFinalRegDeadlineC()|date('Y-m-d') }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.getSubmissionDeadlineC() %}
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Submission Deadline</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-clock-o mr-1"></i>
+                                    {{ event.getSubmissionDeadlineC()|date('Y-m-d') }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Information Card -->
+            {% if event.getBudget() or event.getCurrencyId() %}
+            <div class="panel panel-success mb-3">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-money mr-2"></i>
+                        Financial Information
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        {% if event.getBudget() %}
+                        <div class="col-md-6">
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Budget</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-dollar mr-1"></i>
+                                    {{ event.getBudget()|number_format(2, '.', ',') }}
+                                    {% if event.getCurrencyId() %}{{ event.getCurrencyId() }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if event.getCurrencyId() %}
+                        <div class="col-md-6">
+                            <div class="detail-item mb-3">
+                                <label class="detail-label">Currency</label>
+                                <div class="detail-value">
+                                    <i class="fa fa-money mr-1"></i>
+                                    {{ event.getCurrencyId() }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Contacts Management Card -->
             <div class="panel panel-info">
@@ -183,20 +345,89 @@
                     </a>
                     {% endif %}
                     
-                    {% if event.getWebsite() %}
-                    <a href="{{ event.getWebsite() }}" target="_blank" rel="noopener noreferrer" 
+                    {% if event.getWebsiteUrlC() %}
+                    <a href="{{ event.getWebsiteUrlC() }}" target="_blank" rel="noopener noreferrer"
                        class="btn btn-secondary btn-block mb-2 btn-nospin">
                         <i class="fa fa-external-link mr-1"></i>
-                        {% trans %}mautic.events.visit_website{% endtrans %}
+                        Visit Website
                     </a>
                     {% endif %}
-                    
-                    {% if event.getRegistrationUrl() %}
-                    <a href="{{ event.getRegistrationUrl() }}" target="_blank" rel="noopener noreferrer" 
-                       class="btn btn-tertiary btn-block btn-nospin mt-8" style="margin-left: 0 !important;">
+
+                    {% if event.getRegistrationUrlC() %}
+                    <a href="{{ event.getRegistrationUrlC() }}" target="_blank" rel="noopener noreferrer"
+                       class="btn btn-success btn-block mb-2 btn-nospin">
                         <i class="fa fa-ticket mr-1"></i>
-                        {% trans %}mautic.events.register_now{% endtrans %}
+                        Register Now
                     </a>
+                    {% endif %}
+
+                    {% if event.getEventProgramUrlC() %}
+                    <a href="{{ event.getEventProgramUrlC() }}" target="_blank" rel="noopener noreferrer"
+                       class="btn btn-info btn-block mb-2 btn-nospin">
+                        <i class="fa fa-list mr-1"></i>
+                        View Program
+                    </a>
+                    {% endif %}
+
+                    {% if event.getEventSpeakersUrlC() %}
+                    <a href="{{ event.getEventSpeakersUrlC() }}" target="_blank" rel="noopener noreferrer"
+                       class="btn btn-primary btn-block mb-2 btn-nospin">
+                        <i class="fa fa-microphone mr-1"></i>
+                        View Speakers
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Event URLs Card -->
+            <div class="panel panel-default mb-3">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-link mr-2"></i>
+                        Event Links
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    {% set hasUrls = false %}
+                    {% if event.getEventFaqUrlC() %}
+                        {% set hasUrls = true %}
+                        <a href="{{ event.getEventFaqUrlC() }}" target="_blank" class="btn btn-link btn-sm mb-1">
+                            <i class="fa fa-question-circle mr-1"></i> FAQ
+                        </a><br>
+                    {% endif %}
+                    {% if event.getEventVenueUrlC() %}
+                        {% set hasUrls = true %}
+                        <a href="{{ event.getEventVenueUrlC() }}" target="_blank" class="btn btn-link btn-sm mb-1">
+                            <i class="fa fa-map-marker mr-1"></i> Venue
+                        </a><br>
+                    {% endif %}
+                    {% if event.getVisaUrlC() %}
+                        {% set hasUrls = true %}
+                        <a href="{{ event.getVisaUrlC() }}" target="_blank" class="btn btn-link btn-sm mb-1">
+                            <i class="fa fa-passport mr-1"></i> Visa Info
+                        </a><br>
+                    {% endif %}
+                    {% if event.getEventFacebookUrlC() %}
+                        {% set hasUrls = true %}
+                        <a href="{{ event.getEventFacebookUrlC() }}" target="_blank" class="btn btn-link btn-sm mb-1">
+                            <i class="fa fa-facebook mr-1"></i> Facebook
+                        </a><br>
+                    {% endif %}
+                    {% if event.getEventFeedbackUrlC() %}
+                        {% set hasUrls = true %}
+                        <a href="{{ event.getEventFeedbackUrlC() }}" target="_blank" class="btn btn-link btn-sm mb-1">
+                            <i class="fa fa-comment mr-1"></i> Feedback
+                        </a><br>
+                    {% endif %}
+                    {% if event.getEasyPaymentUrlC() %}
+                        {% set hasUrls = true %}
+                        <a href="{{ event.getEasyPaymentUrlC() }}" target="_blank" class="btn btn-link btn-sm mb-1">
+                            <i class="fa fa-credit-card mr-1"></i> Payment
+                        </a><br>
+                    {% endif %}
+
+                    {% if not hasUrls %}
+                        <p class="text-muted">No additional links available</p>
                     {% endif %}
                 </div>
             </div>

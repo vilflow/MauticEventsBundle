@@ -59,38 +59,38 @@
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.currency',
-                            'text': 'mautic.events.currency',
+                            'orderBy': 'e.eventOrganizerC',
+                            'text': 'Event Organizer',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.country',
-                            'text': 'mautic.events.country',
+                            'orderBy': 'e.eventRoundC',
+                            'text': 'Round',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.city',
-                            'text': 'mautic.events.city',
+                            'orderBy': 'e.eventCityC',
+                            'text': 'City',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.website',
-                            'text': 'mautic.events.website',
+                            'orderBy': 'e.eventCountryC',
+                            'text': 'Country',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.registrationUrl',
-                            'text': 'mautic.events.registration_url',
+                            'orderBy': 'e.eventFieldC',
+                            'text': 'Field',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.suitecrmId',
-                            'text': 'mautic.events.suitecrm_id',
+                            'orderBy': 'e.activityStatusType',
+                            'text': 'Status',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -127,21 +127,40 @@
                             <td class="visible-md visible-lg">{{ item.getId() }}</td>
                             <td>
                                 <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
-                            </td>
-                            <td class="visible-md visible-lg">{{ item.getCurrency() }}</td>
-                            <td class="visible-md visible-lg">{{ item.getCountry() }}</td>
-                            <td class="visible-md visible-lg">{{ item.getCity() }}</td>
-                            <td class="visible-md visible-lg">
-                                {% if item.getWebsite() %}
-                                    <a href="{{ item.getWebsite() }}" target="_blank">{{ item.getWebsite() }}</a>
+                                {% if item.getDescription() %}
+                                    <br><small class="text-muted">{{ item.getDescription()|striptags|truncate(50) }}</small>
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">
-                                {% if item.getRegistrationUrl() %}
-                                    <a href="{{ item.getRegistrationUrl() }}" target="_blank">{{ item.getRegistrationUrl() }}</a>
+                                {% if item.getEventOrganizerC() %}
+                                    <span class="label label-info">{{ item.getEventOrganizerC() }}</span>
                                 {% endif %}
                             </td>
-                            <td class="visible-md visible-lg">{{ item.getSuitecrmId() }}</td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getEventRoundC() %}
+                                    <span class="label label-primary">{{ item.getEventRoundC() }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getEventCityC() %}
+                                    <i class="fa fa-map-marker mr-1"></i>{{ item.getEventCityC() }}
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getEventCountryC() %}
+                                    <i class="fa fa-globe mr-1"></i>{{ item.getEventCountryC()|replace({'_': ' '}) }}
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getEventFieldC() %}
+                                    <span class="label label-success">{{ item.getEventFieldC()|replace({'_': ' '}) }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getActivityStatusType() %}
+                                    <span class="label label-{{ item.getActivityStatusType() == 'active' ? 'success' : 'warning' }}">{{ item.getActivityStatusType()|title }}</span>
+                                {% endif %}
+                            </td>
                             <td class="visible-md visible-lg">{{ item.getEventExternalId() }}</td>
                         </tr>
                     {% endfor %}
