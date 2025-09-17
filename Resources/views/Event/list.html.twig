@@ -73,12 +73,6 @@
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
-                            'orderBy': 'e.dateStart',
-                            'text': 'mautic.events.date_start',
-                            'class': 'visible-md visible-lg'
-                        }) }}
-                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                            'sessionVar': 'event',
                             'orderBy': 'e.eventOrganizerC',
                             'text': 'mautic.events.organizer',
                             'class': 'visible-md visible-lg'
@@ -152,16 +146,6 @@
                                     <div class="mt-xs">
                                         <small class="text-muted">{{ item.getDescription()|striptags|slice(0, 80) }}{% if item.getDescription()|striptags|length > 80 %}...{% endif %}</small>
                                     </div>
-                                {% endif %}
-                            </td>
-                            <td class="visible-md visible-lg">
-                                {% if item.getDateStart() %}
-                                    <div>
-                                        <i class="ri-calendar-line mr-1"></i>{{ item.getDateStart()|date('M d, Y') }}
-                                    </div>
-                                    {% if item.getDateEnd() and item.getDateEnd() != item.getDateStart() %}
-                                        <small class="text-muted">{{ 'mautic.events.to'|trans({'%default%': 'to'})|raw }} {{ item.getDateEnd()|date('M d, Y') }}</small>
-                                    {% endif %}
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">

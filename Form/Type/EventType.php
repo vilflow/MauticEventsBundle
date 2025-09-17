@@ -151,7 +151,7 @@ class EventType extends AbstractType
 
         // Text fields
         $builder->add('eventManagerEmailC', TextType::class, [
-            'label'      => 'LBL_EVENT_MANAGER_EMAIL',
+            'label'      => 'Event Manager Email',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'required'   => false,
@@ -209,22 +209,6 @@ class EventType extends AbstractType
             'required'   => false,
         ]);
 
-        // DateTime fields
-        $builder->add('dateEnd', DateTimeType::class, [
-            'label'      => 'End Date',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-            'widget'     => 'single_text',
-        ]);
-
-        $builder->add('dateStart', DateTimeType::class, [
-            'label'      => 'Start Date',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-            'widget'     => 'single_text',
-        ]);
 
         // Date fields
         $builder->add('earlyBirdRegDeadlineC', DateType::class, [
@@ -235,24 +219,8 @@ class EventType extends AbstractType
             'widget'     => 'single_text',
         ]);
 
-        $builder->add('eventStartDateC', DateType::class, [
-            'label'      => 'Event Start Date',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-            'widget'     => 'single_text',
-        ]);
-
         $builder->add('submissionDeadlineC', DateType::class, [
             'label'      => 'Submission Deadline',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-            'widget'     => 'single_text',
-        ]);
-
-        $builder->add('eventEndDateC', DateType::class, [
-            'label'      => 'Event End Date',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'required'   => false,
@@ -274,6 +242,23 @@ class EventType extends AbstractType
             'required'   => false,
             'widget'     => 'single_text',
         ]);
+
+        $builder->add('eventStartDateC', DateType::class, [
+            'label'      => 'Event Start Date',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'widget'     => 'single_text',
+        ]);
+
+        $builder->add('eventEndDateC', DateType::class, [
+            'label'      => 'Event End Date',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'widget'     => 'single_text',
+        ]);
+
 
         // Currency and Budget
         $builder->add('currencyId', TextType::class, [

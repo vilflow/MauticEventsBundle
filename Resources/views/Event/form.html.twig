@@ -72,22 +72,21 @@
 
                         <!-- Dates & Duration Tab -->
                         <div class="tab-pane fade bdr-w-0" id="dates-container">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="pa-md">
-                                        <h4><strong>{{ 'mautic.events.form.dates.main'|trans({'%default%': 'Event Dates'})|raw }}</strong></h4>
-                                        {{ form_row(form.dateStart) }}
-                                        {{ form_row(form.dateEnd) }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+
+
+                            <div class="row">‍
+                                <div class="col-md-12">
                                     <div class="pa-md">
                                         <h4><strong>{{ 'mautic.events.form.dates.custom'|trans({'%default%': 'Custom Date Fields'})|raw }}</strong></h4>
-                                        {{ form_row(form.eventStartDateC) }}
-                                        {{ form_row(form.eventEndDateC) }}
+                                        <div class="row">
+                                        <div class="col-md-6">{{ form_row(form.eventStartDateC) }}</div>
+                                        <div class="col-md-6">{{ form_row(form.eventEndDateC) }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+
                             <div class="row">‍
                                 <div class="col-md-12">
                                     <div class="pa-md">

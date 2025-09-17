@@ -74,9 +74,6 @@ final class Version_1_3_0 extends AbstractMigration
         // Add new image field
         $table->addColumn('abstract_book_image_c', 'string', ['nullable' => true]);
 
-        // Add new datetime fields
-        $table->addColumn('date_end', 'datetime', ['nullable' => true]);
-        $table->addColumn('date_start', 'datetime', ['nullable' => true]);
         $table->addColumn('date_modified', 'datetime', ['nullable' => true]);
         $table->addColumn('date_entered', 'datetime', ['nullable' => true]);
 
@@ -118,7 +115,7 @@ final class Version_1_3_0 extends AbstractMigration
             'website_url_c', 'easy_payment_url_c', 'decline_redirect', 'accept_redirect',
             'event_manager_email_c', 'isbn_number_c', 'event_wire_transfer_data_c',
             'about_event_c', 'description', 'duration_minutes', 'duration_hours',
-            'abstract_book_image_c', 'date_end', 'date_start', 'date_modified', 'date_entered',
+            'abstract_book_image_c', 'date_modified', 'date_entered',
             'early_bird_reg_deadline_c', 'event_start_date_c', 'submission_deadline_c',
             'event_end_date_c', 'early_reg_deadline_c', 'final_reg_deadline_c',
             'currency_id', 'budget', 'deleted', 'event_organizer_c', 'event_round_c',

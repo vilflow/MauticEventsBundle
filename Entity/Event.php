@@ -148,15 +148,6 @@ class Event extends CommonEntity
      */
     private $abstractBookImageC;
 
-    /**
-     * @var \DateTime|null
-     */
-    private $dateEnd;
-
-    /**
-     * @var \DateTime|null
-     */
-    private $dateStart;
 
     /**
      * @var \DateTime|null
@@ -300,8 +291,6 @@ class Event extends CommonEntity
         $builder->addField('durationMinutes', Types::INTEGER, ['columnName' => 'duration_minutes', 'nullable' => true]);
         $builder->addField('durationHours', Types::INTEGER, ['columnName' => 'duration_hours', 'nullable' => true]);
         $builder->addField('abstractBookImageC', Types::STRING, ['columnName' => 'abstract_book_image_c', 'nullable' => true]);
-        $builder->addField('dateEnd', Types::DATETIME_MUTABLE, ['columnName' => 'date_end', 'nullable' => true]);
-        $builder->addField('dateStart', Types::DATETIME_MUTABLE, ['columnName' => 'date_start', 'nullable' => true]);
         $builder->addField('dateModified', Types::DATETIME_MUTABLE, ['columnName' => 'date_modified', 'nullable' => true]);
         $builder->addField('dateEntered', Types::DATETIME_MUTABLE, ['columnName' => 'date_entered', 'nullable' => true]);
         $builder->addField('earlyBirdRegDeadlineC', Types::DATE_MUTABLE, ['columnName' => 'early_bird_reg_deadline_c', 'nullable' => true]);
@@ -371,8 +360,6 @@ class Event extends CommonEntity
                 'durationMinutes',
                 'durationHours',
                 'abstractBookImageC',
-                'dateEnd',
-                'dateStart',
                 'dateModified',
                 'dateEntered',
                 'earlyBirdRegDeadlineC',
@@ -743,29 +730,6 @@ class Event extends CommonEntity
         return $this;
     }
 
-    public function getDateEnd(): ?\DateTime
-    {
-        return $this->dateEnd;
-    }
-
-    public function setDateEnd(?\DateTime $dateEnd): self
-    {
-        $this->dateEnd = $dateEnd;
-        $this->updatedAt = new \DateTime();
-        return $this;
-    }
-
-    public function getDateStart(): ?\DateTime
-    {
-        return $this->dateStart;
-    }
-
-    public function setDateStart(?\DateTime $dateStart): self
-    {
-        $this->dateStart = $dateStart;
-        $this->updatedAt = new \DateTime();
-        return $this;
-    }
 
     public function getDateModified(): ?\DateTime
     {

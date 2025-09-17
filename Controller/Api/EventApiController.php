@@ -101,8 +101,6 @@ class EventApiController extends CommonApiController
             'duration_minutes' => 'durationMinutes',
             'duration_hours' => 'durationHours',
             'abstract_book_image_c' => 'abstractBookImageC',
-            'date_end' => 'dateEnd',
-            'date_start' => 'dateStart',
             'date_modified' => 'dateModified',
             'date_entered' => 'dateEntered',
             'early_bird_reg_deadline_c' => 'earlyBirdRegDeadlineC',

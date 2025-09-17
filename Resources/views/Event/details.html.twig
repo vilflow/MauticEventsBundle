@@ -153,27 +153,6 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6">
-                            {% if event.getDateStart() %}
-                            <div class="detail-item mb-7">
-                                <label class="detail-label text-muted">{{ 'mautic.events.date_start'|trans }}</label>
-                                <div class="detail-value">
-                                    <i class="ri-calendar-event-line mr-2 text-primary"></i>
-                                    <strong>{{ event.getDateStart()|date('M d, Y') }}</strong>
-                                    <br><small class="text-muted ml-4">{{ event.getDateStart()|date('H:i') }}</small>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                            {% if event.getDateEnd() %}
-                            <div class="detail-item mb-7">
-                                <label class="detail-label text-muted">{{ 'mautic.events.date_end'|trans({'%default%': 'End Date'})|raw }}</label>
-                                <div class="detail-value">
-                                    <i class="ri-calendar-check-line mr-2 text-success"></i>
-                                    <strong>{{ event.getDateEnd()|date('M d, Y') }}</strong>
-                                    <br><small class="text-muted ml-4">{{ event.getDateEnd()|date('H:i') }}</small>
-                                </div>
-                            </div>
-                            {% endif %}
 
                             {% if event.getDurationHours() or event.getDurationMinutes() %}
                             <div class="detail-item mb-7">
