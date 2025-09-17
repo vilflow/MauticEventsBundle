@@ -13,207 +13,123 @@
 {% block content %}
     {{ form_start(form) }}
     <div class="box-layout">
-        <div class="col-md-12 height-auto">
+        {# Left: main content #}
+        <div class="col-md-9 height-auto bdr-r">
             <div class="pa-md">
+                {# Section quick links #}
+                <ul class="nav nav-tabs mb-md" role="tablist">
+                    <li role="presentation"><a href="#basic">Basic</a></li>
+                    <li role="presentation"><a href="#dates">Dates</a></li>
+                    <li role="presentation"><a href="#deadlines">Deadlines</a></li>
+                    <li role="presentation"><a href="#urls">URLs</a></li>
+                    <li role="presentation"><a href="#payment">Payment</a></li>
+                </ul>
+
                 {# Basic Information #}
-                <h4>Basic Information</h4>
+                <h4 id="basic">Basic Information</h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventExternalId) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.name) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.eventExternalId) }}</div>
+                    <div class="col-md-6">{{ form_row(form.name) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        {{ form_row(form.description) }}
-                    </div>
+                    <div class="col-md-12">{{ form_row(form.description) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        {{ form_row(form.aboutEventC) }}
-                    </div>
+                    <div class="col-md-12">{{ form_row(form.aboutEventC) }}</div>
                 </div>
 
-                {# Dropdown Selections #}
-                <h4>Event Configuration</h4>
+                {# Dates & Duration #}
+                <h4 id="dates">Dates & Duration</h4>
                 <div class="row">
-                    <div class="col-md-4">
-                        {{ form_row(form.eventOrganizerC) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.eventRoundC) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.eventManagerNameC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.dateStart) }}</div>
+                    <div class="col-md-6">{{ form_row(form.dateEnd) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
-                        {{ form_row(form.eventCityC) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.eventCountryC) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.eventFieldC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.eventStartDateC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.eventEndDateC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.activityStatusType) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.inviteTemplates) }}
-                    </div>
-                </div>
-
-                {# Contact Information #}
-                <h4>Contact & Management</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventManagerEmailC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.isbnNumberC) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        {{ form_row(form.eventWireTransferDataC) }}
-                    </div>
-                </div>
-
-                {# Date & Time Information #}
-                <h4>Dates & Duration</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.dateStart) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.dateEnd) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventStartDateC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.eventEndDateC) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        {{ form_row(form.durationHours) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.durationMinutes) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.abstractBookImageC) }}
-                    </div>
+                    <div class="col-md-4">{{ form_row(form.durationHours) }}</div>
+                    <div class="col-md-4">{{ form_row(form.durationMinutes) }}</div>
+                    <div class="col-md-4">{{ form_row(form.abstractBookImageC) }}</div>
                 </div>
 
                 {# Registration Deadlines #}
-                <h4>Registration Deadlines</h4>
+                <h4 id="deadlines">Registration Deadlines</h4>
                 <div class="row">
-                    <div class="col-md-4">
-                        {{ form_row(form.earlyBirdRegDeadlineC) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.earlyRegDeadlineC) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.finalRegDeadlineC) }}
-                    </div>
+                    <div class="col-md-4">{{ form_row(form.earlyBirdRegDeadlineC) }}</div>
+                    <div class="col-md-4">{{ form_row(form.earlyRegDeadlineC) }}</div>
+                    <div class="col-md-4">{{ form_row(form.finalRegDeadlineC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.submissionDeadlineC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.deleted) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.submissionDeadlineC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.eventManagerEmailC) }}</div>
                 </div>
 
                 {# URLs Section #}
-                <h4>Event URLs</h4>
+                <h4 id="urls">Event URLs</h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventProgramUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.historyUrlC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.websiteUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.eventProgramUrlC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventSpeakersUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.submissionUrlC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.eventSpeakersUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.submissionUrlC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventFaqUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.eventVenueUrlC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.eventFaqUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.eventVenueUrlC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.visaUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.registrationUrlC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.registrationUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.visaUrlC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventFacebookUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.eventFeedbackUrlC) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.eventFacebookUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.eventFeedbackUrlC) }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.eventTestimonialsUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.websiteUrlC) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.easyPaymentUrlC) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.acceptRedirect) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.declineRedirect) }}
-                    </div>
-                    <div class="col-md-6">
-                        {# Empty for layout balance #}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.eventTestimonialsUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.historyUrlC) }}</div>
                 </div>
 
-                {# Financial Information #}
-                <h4>Financial Information</h4>
+                {# Payment & Invoicing #}
+                <h4 id="payment">Payment & Invoicing</h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.currencyId) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.budget) }}
-                    </div>
+                    <div class="col-md-6">{{ form_row(form.easyPaymentUrlC) }}</div>
+                    <div class="col-md-6">{{ form_row(form.isbnNumberC) }}</div>
                 </div>
+                <div class="row">
+                    <div class="col-md-12">{{ form_row(form.eventWireTransferDataC) }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">{{ form_row(form.acceptRedirect) }}</div>
+                    <div class="col-md-6">{{ form_row(form.declineRedirect) }}</div>
+                </div>
+
+                {{ form_row(form.buttons) }}
+            </div>
+        </div>
+
+        {# Right: side panel (meta/config) #}
+        <div class="col-md-3 height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                <h5 class="mb-sm">Event Configuration</h5>
+                {{ form_row(form.eventOrganizerC) }}
+                {{ form_row(form.eventRoundC) }}
+                {{ form_row(form.eventManagerNameC) }}
+                {{ form_row(form.eventFieldC) }}
+                {{ form_row(form.eventCountryC) }}
+                {{ form_row(form.eventCityC) }}
+                {{ form_row(form.activityStatusType) }}
+                {{ form_row(form.inviteTemplates) }}
+
+                <h5 class="mt-md mb-sm">Financial</h5>
+                {{ form_row(form.currencyId) }}
+                {{ form_row(form.budget) }}
+
+                <h5 class="mt-md mb-sm">System</h5>
+                {{ form_row(form.deleted) }}
             </div>
         </div>
     </div>
