@@ -36,32 +36,182 @@ class Event extends CommonEntity
     /**
      * @var string|null
      */
-    private $website;
+    private $eventProgramUrlC;
 
     /**
      * @var string|null
      */
-    private $currency;
+    private $historyUrlC;
 
     /**
      * @var string|null
      */
-    private $country;
+    private $eventSpeakersUrlC;
 
     /**
      * @var string|null
      */
-    private $city;
+    private $submissionUrlC;
 
     /**
      * @var string|null
      */
-    private $registrationUrl;
+    private $eventFaqUrlC;
 
     /**
      * @var string|null
      */
-    private $suitecrmId;
+    private $eventVenueUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $visaUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $registrationUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $eventFacebookUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $eventFeedbackUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $eventTestimonialsUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $websiteUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $easyPaymentUrlC;
+
+    /**
+     * @var string|null
+     */
+    private $declineRedirect;
+
+    /**
+     * @var string|null
+     */
+    private $acceptRedirect;
+
+    /**
+     * @var string|null
+     */
+    private $eventManagerEmailC;
+
+    /**
+     * @var string|null
+     */
+    private $isbnNumberC;
+
+    /**
+     * @var string|null
+     */
+    private $eventWireTransferDataC;
+
+    /**
+     * @var string|null
+     */
+    private $aboutEventC;
+
+    /**
+     * @var string|null
+     */
+    private $description;
+
+    /**
+     * @var int|null
+     */
+    private $durationMinutes;
+
+    /**
+     * @var int|null
+     */
+    private $durationHours;
+
+    /**
+     * @var string|null
+     */
+    private $abstractBookImageC;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $dateEnd;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $dateStart;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $dateModified;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $dateEntered;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $earlyBirdRegDeadlineC;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $eventStartDateC;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $submissionDeadlineC;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $eventEndDateC;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $earlyRegDeadlineC;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $finalRegDeadlineC;
+
+    /**
+     * @var string|null
+     */
+    private $currencyId;
+
+    /**
+     * @var float|null
+     */
+    private $budget;
+
+    /**
+     * @var bool
+     */
+    private $deleted = false;
 
     /**
      * @var \DateTime|null
@@ -87,12 +237,42 @@ class Event extends CommonEntity
         $builder->addId();
         $builder->addField('eventExternalId', Types::STRING, ['columnName' => 'event_external_id', 'unique' => true]);
         $builder->addField('name', Types::STRING, ['columnName' => 'name']);
-        $builder->addField('website', Types::STRING, ['nullable' => true]);
-        $builder->addField('currency', Types::STRING, ['nullable' => true, 'length' => 3]);
-        $builder->addField('country', Types::STRING, ['nullable' => true]);
-        $builder->addField('city', Types::STRING, ['nullable' => true]);
-        $builder->addField('registrationUrl', Types::STRING, ['columnName' => 'registration_url', 'nullable' => true]);
-        $builder->addField('suitecrmId', Types::STRING, ['columnName' => 'suitecrm_id', 'nullable' => true]);
+        $builder->addField('eventProgramUrlC', Types::STRING, ['columnName' => 'event_program_url_c', 'nullable' => true]);
+        $builder->addField('historyUrlC', Types::STRING, ['columnName' => 'history_url_c', 'nullable' => true]);
+        $builder->addField('eventSpeakersUrlC', Types::STRING, ['columnName' => 'event_speakers_url_c', 'nullable' => true]);
+        $builder->addField('submissionUrlC', Types::STRING, ['columnName' => 'submission_url_c', 'nullable' => true]);
+        $builder->addField('eventFaqUrlC', Types::STRING, ['columnName' => 'event_faq_url_c', 'nullable' => true]);
+        $builder->addField('eventVenueUrlC', Types::STRING, ['columnName' => 'event_venue_url_c', 'nullable' => true]);
+        $builder->addField('visaUrlC', Types::STRING, ['columnName' => 'visa_url_c', 'nullable' => true]);
+        $builder->addField('registrationUrlC', Types::STRING, ['columnName' => 'registration_url_c', 'nullable' => true]);
+        $builder->addField('eventFacebookUrlC', Types::STRING, ['columnName' => 'event_facebook_url_c', 'nullable' => true]);
+        $builder->addField('eventFeedbackUrlC', Types::STRING, ['columnName' => 'event_feedback_url_c', 'nullable' => true]);
+        $builder->addField('eventTestimonialsUrlC', Types::STRING, ['columnName' => 'event_testimonials_url_c', 'nullable' => true]);
+        $builder->addField('websiteUrlC', Types::STRING, ['columnName' => 'website_url_c', 'nullable' => true]);
+        $builder->addField('easyPaymentUrlC', Types::STRING, ['columnName' => 'easy_payment_url_c', 'nullable' => true]);
+        $builder->addField('declineRedirect', Types::STRING, ['columnName' => 'decline_redirect', 'nullable' => true]);
+        $builder->addField('acceptRedirect', Types::STRING, ['columnName' => 'accept_redirect', 'nullable' => true]);
+        $builder->addField('eventManagerEmailC', Types::STRING, ['columnName' => 'event_manager_email_c', 'nullable' => true]);
+        $builder->addField('isbnNumberC', Types::STRING, ['columnName' => 'isbn_number_c', 'nullable' => true]);
+        $builder->addField('eventWireTransferDataC', Types::TEXT, ['columnName' => 'event_wire_transfer_data_c', 'nullable' => true]);
+        $builder->addField('aboutEventC', Types::TEXT, ['columnName' => 'about_event_c', 'nullable' => true]);
+        $builder->addField('description', Types::TEXT, ['columnName' => 'description', 'nullable' => true]);
+        $builder->addField('durationMinutes', Types::INTEGER, ['columnName' => 'duration_minutes', 'nullable' => true]);
+        $builder->addField('durationHours', Types::INTEGER, ['columnName' => 'duration_hours', 'nullable' => true]);
+        $builder->addField('abstractBookImageC', Types::STRING, ['columnName' => 'abstract_book_image_c', 'nullable' => true]);
+        $builder->addField('dateEnd', Types::DATETIME_MUTABLE, ['columnName' => 'date_end', 'nullable' => true]);
+        $builder->addField('dateStart', Types::DATETIME_MUTABLE, ['columnName' => 'date_start', 'nullable' => true]);
+        $builder->addField('dateModified', Types::DATETIME_MUTABLE, ['columnName' => 'date_modified', 'nullable' => true]);
+        $builder->addField('dateEntered', Types::DATETIME_MUTABLE, ['columnName' => 'date_entered', 'nullable' => true]);
+        $builder->addField('earlyBirdRegDeadlineC', Types::DATE_MUTABLE, ['columnName' => 'early_bird_reg_deadline_c', 'nullable' => true]);
+        $builder->addField('eventStartDateC', Types::DATE_MUTABLE, ['columnName' => 'event_start_date_c', 'nullable' => true]);
+        $builder->addField('submissionDeadlineC', Types::DATE_MUTABLE, ['columnName' => 'submission_deadline_c', 'nullable' => true]);
+        $builder->addField('eventEndDateC', Types::DATE_MUTABLE, ['columnName' => 'event_end_date_c', 'nullable' => true]);
+        $builder->addField('earlyRegDeadlineC', Types::DATE_MUTABLE, ['columnName' => 'early_reg_deadline_c', 'nullable' => true]);
+        $builder->addField('finalRegDeadlineC', Types::DATE_MUTABLE, ['columnName' => 'final_reg_deadline_c', 'nullable' => true]);
+        $builder->addField('currencyId', Types::STRING, ['columnName' => 'currency_id', 'nullable' => true]);
+        $builder->addField('budget', Types::DECIMAL, ['columnName' => 'budget', 'nullable' => true, 'precision' => 10, 'scale' => 2]);
+        $builder->addField('deleted', Types::BOOLEAN, ['columnName' => 'deleted', 'nullable' => false, 'default' => false]);
         $builder->addField('createdAt', Types::DATETIME_MUTABLE, ['columnName' => 'created_at', 'nullable' => true]);
         $builder->addField('updatedAt', Types::DATETIME_MUTABLE, ['columnName' => 'updated_at', 'nullable' => true]);
 
@@ -120,12 +300,42 @@ class Event extends CommonEntity
                 'id',
                 'eventExternalId',
                 'name',
-                'website',
-                'currency',
-                'country',
-                'city',
-                'registrationUrl',
-                'suitecrmId',
+                'eventProgramUrlC',
+                'historyUrlC',
+                'eventSpeakersUrlC',
+                'submissionUrlC',
+                'eventFaqUrlC',
+                'eventVenueUrlC',
+                'visaUrlC',
+                'registrationUrlC',
+                'eventFacebookUrlC',
+                'eventFeedbackUrlC',
+                'eventTestimonialsUrlC',
+                'websiteUrlC',
+                'easyPaymentUrlC',
+                'declineRedirect',
+                'acceptRedirect',
+                'eventManagerEmailC',
+                'isbnNumberC',
+                'eventWireTransferDataC',
+                'aboutEventC',
+                'description',
+                'durationMinutes',
+                'durationHours',
+                'abstractBookImageC',
+                'dateEnd',
+                'dateStart',
+                'dateModified',
+                'dateEntered',
+                'earlyBirdRegDeadlineC',
+                'eventStartDateC',
+                'submissionDeadlineC',
+                'eventEndDateC',
+                'earlyRegDeadlineC',
+                'finalRegDeadlineC',
+                'currencyId',
+                'budget',
+                'deleted',
             ])
             ->addProperties([
                 'createdAt',
@@ -139,6 +349,9 @@ class Event extends CommonEntity
         $this->eventContacts = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->dateEntered = new \DateTime();
+        $this->dateModified = new \DateTime();
+        $this->deleted = false;
     }
 
     public function getId(): ?int
@@ -197,74 +410,433 @@ class Event extends CommonEntity
         return $this;
     }
 
-    public function getWebsite(): ?string
+
+    public function getEventProgramUrlC(): ?string
     {
-        return $this->website;
+        return $this->eventProgramUrlC;
     }
 
-    public function setWebsite(?string $website): self
+    public function setEventProgramUrlC(?string $eventProgramUrlC): self
     {
-        $this->website = $website;
+        $this->eventProgramUrlC = $eventProgramUrlC;
         $this->updatedAt = new \DateTime();
         return $this;
     }
 
-    public function getCurrency(): ?string
+    public function getHistoryUrlC(): ?string
     {
-        return $this->currency;
+        return $this->historyUrlC;
     }
 
-    public function setCurrency(?string $currency): self
+    public function setHistoryUrlC(?string $historyUrlC): self
     {
-        $this->currency = $currency;
+        $this->historyUrlC = $historyUrlC;
         $this->updatedAt = new \DateTime();
         return $this;
     }
 
-    public function getCountry(): ?string
+    public function getEventSpeakersUrlC(): ?string
     {
-        return $this->country;
+        return $this->eventSpeakersUrlC;
     }
 
-    public function setCountry(?string $country): self
+    public function setEventSpeakersUrlC(?string $eventSpeakersUrlC): self
     {
-        $this->country = $country;
+        $this->eventSpeakersUrlC = $eventSpeakersUrlC;
         $this->updatedAt = new \DateTime();
         return $this;
     }
 
-    public function getCity(): ?string
+    public function getSubmissionUrlC(): ?string
     {
-        return $this->city;
+        return $this->submissionUrlC;
     }
 
-    public function setCity(?string $city): self
+    public function setSubmissionUrlC(?string $submissionUrlC): self
     {
-        $this->city = $city;
+        $this->submissionUrlC = $submissionUrlC;
         $this->updatedAt = new \DateTime();
         return $this;
     }
 
-    public function getRegistrationUrl(): ?string
+    public function getEventFaqUrlC(): ?string
     {
-        return $this->registrationUrl;
+        return $this->eventFaqUrlC;
     }
 
-    public function setRegistrationUrl(?string $registrationUrl): self
+    public function setEventFaqUrlC(?string $eventFaqUrlC): self
     {
-        $this->registrationUrl = $registrationUrl;
+        $this->eventFaqUrlC = $eventFaqUrlC;
         $this->updatedAt = new \DateTime();
         return $this;
     }
 
-    public function getSuitecrmId(): ?string
+    public function getEventVenueUrlC(): ?string
     {
-        return $this->suitecrmId;
+        return $this->eventVenueUrlC;
     }
 
-    public function setSuitecrmId(?string $suitecrmId): self
+    public function setEventVenueUrlC(?string $eventVenueUrlC): self
     {
-        $this->suitecrmId = $suitecrmId;
+        $this->eventVenueUrlC = $eventVenueUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getVisaUrlC(): ?string
+    {
+        return $this->visaUrlC;
+    }
+
+    public function setVisaUrlC(?string $visaUrlC): self
+    {
+        $this->visaUrlC = $visaUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getRegistrationUrlC(): ?string
+    {
+        return $this->registrationUrlC;
+    }
+
+    public function setRegistrationUrlC(?string $registrationUrlC): self
+    {
+        $this->registrationUrlC = $registrationUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventFacebookUrlC(): ?string
+    {
+        return $this->eventFacebookUrlC;
+    }
+
+    public function setEventFacebookUrlC(?string $eventFacebookUrlC): self
+    {
+        $this->eventFacebookUrlC = $eventFacebookUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventFeedbackUrlC(): ?string
+    {
+        return $this->eventFeedbackUrlC;
+    }
+
+    public function setEventFeedbackUrlC(?string $eventFeedbackUrlC): self
+    {
+        $this->eventFeedbackUrlC = $eventFeedbackUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventTestimonialsUrlC(): ?string
+    {
+        return $this->eventTestimonialsUrlC;
+    }
+
+    public function setEventTestimonialsUrlC(?string $eventTestimonialsUrlC): self
+    {
+        $this->eventTestimonialsUrlC = $eventTestimonialsUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getWebsiteUrlC(): ?string
+    {
+        return $this->websiteUrlC;
+    }
+
+    public function setWebsiteUrlC(?string $websiteUrlC): self
+    {
+        $this->websiteUrlC = $websiteUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEasyPaymentUrlC(): ?string
+    {
+        return $this->easyPaymentUrlC;
+    }
+
+    public function setEasyPaymentUrlC(?string $easyPaymentUrlC): self
+    {
+        $this->easyPaymentUrlC = $easyPaymentUrlC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDeclineRedirect(): ?string
+    {
+        return $this->declineRedirect;
+    }
+
+    public function setDeclineRedirect(?string $declineRedirect): self
+    {
+        $this->declineRedirect = $declineRedirect;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getAcceptRedirect(): ?string
+    {
+        return $this->acceptRedirect;
+    }
+
+    public function setAcceptRedirect(?string $acceptRedirect): self
+    {
+        $this->acceptRedirect = $acceptRedirect;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventManagerEmailC(): ?string
+    {
+        return $this->eventManagerEmailC;
+    }
+
+    public function setEventManagerEmailC(?string $eventManagerEmailC): self
+    {
+        $this->eventManagerEmailC = $eventManagerEmailC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getIsbnNumberC(): ?string
+    {
+        return $this->isbnNumberC;
+    }
+
+    public function setIsbnNumberC(?string $isbnNumberC): self
+    {
+        $this->isbnNumberC = $isbnNumberC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventWireTransferDataC(): ?string
+    {
+        return $this->eventWireTransferDataC;
+    }
+
+    public function setEventWireTransferDataC(?string $eventWireTransferDataC): self
+    {
+        $this->eventWireTransferDataC = $eventWireTransferDataC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getAboutEventC(): ?string
+    {
+        return $this->aboutEventC;
+    }
+
+    public function setAboutEventC(?string $aboutEventC): self
+    {
+        $this->aboutEventC = $aboutEventC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDurationMinutes(): ?int
+    {
+        return $this->durationMinutes;
+    }
+
+    public function setDurationMinutes(?int $durationMinutes): self
+    {
+        $this->durationMinutes = $durationMinutes;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDurationHours(): ?int
+    {
+        return $this->durationHours;
+    }
+
+    public function setDurationHours(?int $durationHours): self
+    {
+        $this->durationHours = $durationHours;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getAbstractBookImageC(): ?string
+    {
+        return $this->abstractBookImageC;
+    }
+
+    public function setAbstractBookImageC(?string $abstractBookImageC): self
+    {
+        $this->abstractBookImageC = $abstractBookImageC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTime
+    {
+        return $this->dateEnd;
+    }
+
+    public function setDateEnd(?\DateTime $dateEnd): self
+    {
+        $this->dateEnd = $dateEnd;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDateStart(): ?\DateTime
+    {
+        return $this->dateStart;
+    }
+
+    public function setDateStart(?\DateTime $dateStart): self
+    {
+        $this->dateStart = $dateStart;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDateModified(): ?\DateTime
+    {
+        return $this->dateModified;
+    }
+
+    public function setDateModified(?\DateTime $dateModified): self
+    {
+        $this->dateModified = $dateModified;
+        return $this;
+    }
+
+    public function getDateEntered(): ?\DateTime
+    {
+        return $this->dateEntered;
+    }
+
+    public function setDateEntered(?\DateTime $dateEntered): self
+    {
+        $this->dateEntered = $dateEntered;
+        return $this;
+    }
+
+    public function getEarlyBirdRegDeadlineC(): ?\DateTime
+    {
+        return $this->earlyBirdRegDeadlineC;
+    }
+
+    public function setEarlyBirdRegDeadlineC(?\DateTime $earlyBirdRegDeadlineC): self
+    {
+        $this->earlyBirdRegDeadlineC = $earlyBirdRegDeadlineC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventStartDateC(): ?\DateTime
+    {
+        return $this->eventStartDateC;
+    }
+
+    public function setEventStartDateC(?\DateTime $eventStartDateC): self
+    {
+        $this->eventStartDateC = $eventStartDateC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getSubmissionDeadlineC(): ?\DateTime
+    {
+        return $this->submissionDeadlineC;
+    }
+
+    public function setSubmissionDeadlineC(?\DateTime $submissionDeadlineC): self
+    {
+        $this->submissionDeadlineC = $submissionDeadlineC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventEndDateC(): ?\DateTime
+    {
+        return $this->eventEndDateC;
+    }
+
+    public function setEventEndDateC(?\DateTime $eventEndDateC): self
+    {
+        $this->eventEndDateC = $eventEndDateC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEarlyRegDeadlineC(): ?\DateTime
+    {
+        return $this->earlyRegDeadlineC;
+    }
+
+    public function setEarlyRegDeadlineC(?\DateTime $earlyRegDeadlineC): self
+    {
+        $this->earlyRegDeadlineC = $earlyRegDeadlineC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getFinalRegDeadlineC(): ?\DateTime
+    {
+        return $this->finalRegDeadlineC;
+    }
+
+    public function setFinalRegDeadlineC(?\DateTime $finalRegDeadlineC): self
+    {
+        $this->finalRegDeadlineC = $finalRegDeadlineC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getCurrencyId(): ?string
+    {
+        return $this->currencyId;
+    }
+
+    public function setCurrencyId(?string $currencyId): self
+    {
+        $this->currencyId = $currencyId;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getBudget(): ?float
+    {
+        return $this->budget;
+    }
+
+    public function setBudget(?float $budget): self
+    {
+        $this->budget = $budget;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
         $this->updatedAt = new \DateTime();
         return $this;
     }
