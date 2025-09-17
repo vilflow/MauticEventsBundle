@@ -12,123 +12,240 @@
 
 {% block content %}
     {{ form_start(form) }}
+    {{ form_errors(form) }}
     <div class="box-layout">
         {# Left: main content #}
-        <div class="col-md-9 height-auto bdr-r">
-            <div class="pa-md">
-                {# Section quick links #}
-                <ul class="nav nav-tabs mb-md" role="tablist">
-                    <li role="presentation"><a href="#basic">Basic</a></li>
-                    <li role="presentation"><a href="#dates">Dates</a></li>
-                    <li role="presentation"><a href="#deadlines">Deadlines</a></li>
-                    <li role="presentation"><a href="#urls">URLs</a></li>
-                    <li role="presentation"><a href="#payment">Payment</a></li>
-                </ul>
+        <div class="col-md-9 height-auto">
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- tabs controls -->
+                    <ul class="nav nav-tabs nav-tabs-contained">
+                        <li class="active">
+                            <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="#dates-container" role="tab" data-toggle="tab">{{ 'mautic.events.tab.dates'|trans({'%default%': 'Dates & Duration'})|raw }}</a>
+                        </li>
+                        <li>
+                            <a href="#deadlines-container" role="tab" data-toggle="tab">{{ 'mautic.events.tab.deadlines'|trans({'%default%': 'Registration'})|raw }}</a>
+                        </li>
+                        <li>
+                            <a href="#urls-container" role="tab" data-toggle="tab">{{ 'mautic.events.tab.urls'|trans({'%default%': 'URLs & Links'})|raw }}</a>
+                        </li>
+                        <li>
+                            <a href="#payment-container" role="tab" data-toggle="tab">{{ 'mautic.events.tab.payment'|trans({'%default%': 'Payment & Invoicing'})|raw }}</a>
+                        </li>
+                    </ul>
+                    <!--/ tabs controls -->
 
-                {# Basic Information #}
-                <h4 id="basic">Basic Information</h4>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.eventExternalId) }}</div>
-                    <div class="col-md-6">{{ form_row(form.name) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">{{ form_row(form.description) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">{{ form_row(form.aboutEventC) }}</div>
-                </div>
+                    <div class="tab-content pa-md">
+                        <!-- Basic Details Tab -->
+                        <div class="tab-pane fade in active bdr-w-0" id="details-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        {{ form_row(form.name) }}
+                                        {{ form_row(form.eventExternalId) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        {{ form_row(form.abstractBookImageC) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        {{ form_row(form.description) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        {{ form_row(form.aboutEventC) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                {# Dates & Duration #}
-                <h4 id="dates">Dates & Duration</h4>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.dateStart) }}</div>
-                    <div class="col-md-6">{{ form_row(form.dateEnd) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.eventStartDateC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.eventEndDateC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">{{ form_row(form.durationHours) }}</div>
-                    <div class="col-md-4">{{ form_row(form.durationMinutes) }}</div>
-                    <div class="col-md-4">{{ form_row(form.abstractBookImageC) }}</div>
-                </div>
+                        <!-- Dates & Duration Tab -->
+                        <div class="tab-pane fade bdr-w-0" id="dates-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.dates.main'|trans({'%default%': 'Event Dates'})|raw }}</strong></h4>
+                                        {{ form_row(form.dateStart) }}
+                                        {{ form_row(form.dateEnd) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.dates.custom'|trans({'%default%': 'Custom Date Fields'})|raw }}</strong></h4>
+                                        {{ form_row(form.eventStartDateC) }}
+                                        {{ form_row(form.eventEndDateC) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">‍
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.duration'|trans({'%default%': 'Duration'})|raw }}</strong></h4>
+                                        <div class="row">
+                                            <div class="col-md-6">{{ form_row(form.durationHours) }}</div>
+                                            <div class="col-md-6">{{ form_row(form.durationMinutes) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                {# Registration Deadlines #}
-                <h4 id="deadlines">Registration Deadlines</h4>
-                <div class="row">
-                    <div class="col-md-4">{{ form_row(form.earlyBirdRegDeadlineC) }}</div>
-                    <div class="col-md-4">{{ form_row(form.earlyRegDeadlineC) }}</div>
-                    <div class="col-md-4">{{ form_row(form.finalRegDeadlineC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.submissionDeadlineC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.eventManagerEmailC) }}</div>
-                </div>
+                        <!-- Registration & Deadlines Tab -->
+                        <div class="tab-pane fade bdr-w-0" id="deadlines-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.deadlines.registration'|trans({'%default%': 'Registration Deadlines'})|raw }}</strong></h4>
+                                        <div class="row">
+                                            <div class="col-md-6">{{ form_row(form.earlyBirdRegDeadlineC) }}</div>
+                                            <div class="col-md-6">{{ form_row(form.earlyRegDeadlineC) }}</div>
+                                            <div class="col-md-6">{{ form_row(form.finalRegDeadlineC) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.submission'|trans({'%default%': 'Submission Details'})|raw }}</strong></h4>
+                                        {{ form_row(form.submissionDeadlineC) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.contact'|trans({'%default%': 'Contact Information'})|raw }}</strong></h4>
+                                        {{ form_row(form.eventManagerEmailC) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                {# URLs Section #}
-                <h4 id="urls">Event URLs</h4>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.websiteUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.eventProgramUrlC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.eventSpeakersUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.submissionUrlC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.eventFaqUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.eventVenueUrlC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.registrationUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.visaUrlC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.eventFacebookUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.eventFeedbackUrlC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.eventTestimonialsUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.historyUrlC) }}</div>
-                </div>
+                        <!-- URLs & Links Tab -->
+                        <div class="tab-pane fade bdr-w-0" id="urls-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.urls.main'|trans({'%default%': 'Main Event URLs'})|raw }}</strong></h4>
+                                        {{ form_row(form.websiteUrlC) }}
+                                        {{ form_row(form.eventProgramUrlC) }}
+                                        {{ form_row(form.registrationUrlC) }}
+                                        {{ form_row(form.eventVenueUrlC) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.urls.content'|trans({'%default%': 'Content & Information'})|raw }}</strong></h4>
+                                        {{ form_row(form.eventSpeakersUrlC) }}
+                                        {{ form_row(form.eventFaqUrlC) }}
+                                        {{ form_row(form.submissionUrlC) }}
+                                        {{ form_row(form.visaUrlC) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.urls.social'|trans({'%default%': 'Social & Feedback'})|raw }}</strong></h4>
+                                        {{ form_row(form.eventFacebookUrlC) }}
+                                        {{ form_row(form.eventFeedbackUrlC) }}
+                                        {{ form_row(form.eventTestimonialsUrlC) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.urls.additional'|trans({'%default%': 'Additional Links'})|raw }}</strong></h4>
+                                        {{ form_row(form.historyUrlC) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                {# Payment & Invoicing #}
-                <h4 id="payment">Payment & Invoicing</h4>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.easyPaymentUrlC) }}</div>
-                    <div class="col-md-6">{{ form_row(form.isbnNumberC) }}</div>
+                        <!-- Payment & Invoicing Tab -->
+                        <div class="tab-pane fade bdr-w-0" id="payment-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.payment.online'|trans({'%default%': 'Online Payment'})|raw }}</strong></h4>
+                                        {{ form_row(form.easyPaymentUrlC) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.payment.details'|trans({'%default%': 'Payment Details'})|raw }}</strong></h4>
+                                        {{ form_row(form.isbnNumberC) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.payment.wire'|trans({'%default%': 'Wire Transfer Information'})|raw }}</strong></h4>
+                                        {{ form_row(form.eventWireTransferDataC) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>{{ 'mautic.events.form.payment.redirects'|trans({'%default%': 'Payment Redirects'})|raw }}</strong></h4>
+                                        {{ form_row(form.acceptRedirect) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <h4><strong>&nbsp;</strong></h4>
+                                        {{ form_row(form.declineRedirect) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">{{ form_row(form.eventWireTransferDataC) }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ form_row(form.acceptRedirect) }}</div>
-                    <div class="col-md-6">{{ form_row(form.declineRedirect) }}</div>
-                </div>
+            </div>
 
-                {{ form_row(form.buttons) }}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="pa-md">
+                        {{ form_row(form.buttons) }}
+                    </div>
+                </div>
             </div>
         </div>
 
         {# Right: side panel (meta/config) #}
-        <div class="col-md-3 height-auto">
+        <div class="col-md-3 height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <h5 class="mb-sm">Event Configuration</h5>
+                <h5>{{ 'mautic.events.form.config.event'|trans({'%default%': 'Event Configuration'})|raw }}</h5>
                 {{ form_row(form.eventOrganizerC) }}
                 {{ form_row(form.eventRoundC) }}
                 {{ form_row(form.eventManagerNameC) }}
                 {{ form_row(form.eventFieldC) }}
-                {{ form_row(form.eventCountryC) }}
-                {{ form_row(form.eventCityC) }}
                 {{ form_row(form.activityStatusType) }}
                 {{ form_row(form.inviteTemplates) }}
 
-                <h5 class="mt-md mb-sm">Financial</h5>
+                <hr>
+                <h5>{{ 'mautic.events.form.config.location'|trans({'%default%': 'Location'})|raw }}</h5>
+                {{ form_row(form.eventCountryC) }}
+                {{ form_row(form.eventCityC) }}
+
+                <hr>
+                <h5>{{ 'mautic.events.form.config.financial'|trans({'%default%': 'Financial'})|raw }}</h5>
                 {{ form_row(form.currencyId) }}
                 {{ form_row(form.budget) }}
 
-                <h5 class="mt-md mb-sm">System</h5>
+                <hr>
+                <h5>{{ 'mautic.events.form.config.system'|trans({'%default%': 'System'})|raw }}</h5>
                 {{ form_row(form.deleted) }}
             </div>
         </div>

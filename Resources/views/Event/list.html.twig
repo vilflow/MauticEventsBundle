@@ -24,7 +24,21 @@
                     'templateButtons': {
                         'delete': permissions['events:events:delete']
                     }
-                }
+                },
+                'quickFilters': [
+                    {
+                        'search': 'status:active',
+                        'label': 'mautic.events.filter.active',
+                        'tooltip': 'mautic.events.filter.active.tooltip',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'status:inactive',
+                        'label': 'mautic.events.filter.inactive',
+                        'tooltip': 'mautic.events.filter.inactive.tooltip',
+                        'icon': 'ri-close-line'
+                    }
+                ]
             }) }}
             <div class="page-list">
                 {{ block('mainContent') }}
@@ -59,45 +73,45 @@
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
+                            'orderBy': 'e.dateStart',
+                            'text': 'mautic.events.date_start',
+                            'class': 'visible-md visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
                             'orderBy': 'e.eventOrganizerC',
-                            'text': 'Event Organizer',
+                            'text': 'mautic.events.organizer',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
                             'orderBy': 'e.eventRoundC',
-                            'text': 'Round',
-                            'class': 'visible-md visible-lg'
+                            'text': 'mautic.events.round',
+                            'class': 'visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
                             'orderBy': 'e.eventCityC',
-                            'text': 'City',
-                            'class': 'visible-md visible-lg'
-                        }) }}
-                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                            'sessionVar': 'event',
-                            'orderBy': 'e.eventCountryC',
-                            'text': 'Country',
+                            'text': 'mautic.events.location',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
                             'orderBy': 'e.eventFieldC',
-                            'text': 'Field',
-                            'class': 'visible-md visible-lg'
+                            'text': 'mautic.events.field',
+                            'class': 'visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
                             'orderBy': 'e.activityStatusType',
-                            'text': 'Status',
+                            'text': 'mautic.core.status',
                             'class': 'visible-md visible-lg'
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
                             'orderBy': 'e.eventExternalId',
                             'text': 'mautic.events.event_external_id',
-                            'class': 'visible-md visible-lg'
+                            'class': 'visible-lg'
                         }) }}
                     </tr>
                 </thead>
@@ -126,9 +140,28 @@
                             </td>
                             <td class="visible-md visible-lg">{{ item.getId() }}</td>
                             <td>
-                                <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax">{{ item.getName() }}</a>
+                                <div>
+                                    <a href="{{ path('mautic_event_action', {objectAction: 'view', objectId: item.getId()}) }}" data-toggle="ajax" class="fw-sb">
+                                        {{ item.getName() }}
+                                    </a>
+                                    {% if item.getEventExternalId() %}
+                                        <small class="text-muted ml-2">({{ item.getEventExternalId() }})</small>
+                                    {% endif %}
+                                </div>
                                 {% if item.getDescription() %}
-                                    <br><small class="text-muted">{{ item.getDescription()|striptags|slice(0, 50) }}{% if item.getDescription()|striptags|length > 50 %}...{% endif %}</small>
+                                    <div class="mt-xs">
+                                        <small class="text-muted">{{ item.getDescription()|striptags|slice(0, 80) }}{% if item.getDescription()|striptags|length > 80 %}...{% endif %}</small>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if item.getDateStart() %}
+                                    <div>
+                                        <i class="ri-calendar-line mr-1"></i>{{ item.getDateStart()|date('M d, Y') }}
+                                    </div>
+                                    {% if item.getDateEnd() and item.getDateEnd() != item.getDateStart() %}
+                                        <small class="text-muted">{{ 'mautic.events.to'|trans({'%default%': 'to'})|raw }} {{ item.getDateEnd()|date('M d, Y') }}</small>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">
@@ -136,32 +169,44 @@
                                     <span class="label label-info">{{ item.getEventOrganizerC() }}</span>
                                 {% endif %}
                             </td>
-                            <td class="visible-md visible-lg">
+                            <td class="visible-lg">
                                 {% if item.getEventRoundC() %}
                                     <span class="label label-primary">{{ item.getEventRoundC() }}</span>
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">
-                                {% if item.getEventCityC() %}
-                                    <i class="fa fa-map-marker mr-1"></i>{{ item.getEventCityC() }}
+                                {% if item.getEventCityC() or item.getEventCountryC() %}
+                                    <div>
+                                        <i class="ri-map-pin-line mr-1"></i>
+                                        {% if item.getEventCityC() %}
+                                            {{ item.getEventCityC() }}
+                                        {% endif %}
+                                        {% if item.getEventCountryC() and item.getEventCityC() %}, {% endif %}
+                                        {% if item.getEventCountryC() %}
+                                            {{ item.getEventCountryC()|replace({'_': ' '}) }}
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
                             </td>
-                            <td class="visible-md visible-lg">
-                                {% if item.getEventCountryC() %}
-                                    <i class="fa fa-globe mr-1"></i>{{ item.getEventCountryC()|replace({'_': ' '}) }}
-                                {% endif %}
-                            </td>
-                            <td class="visible-md visible-lg">
+                            <td class="visible-lg">
                                 {% if item.getEventFieldC() %}
                                     <span class="label label-success">{{ item.getEventFieldC()|replace({'_': ' '}) }}</span>
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">
                                 {% if item.getActivityStatusType() %}
-                                    <span class="label label-{{ item.getActivityStatusType() == 'active' ? 'success' : 'warning' }}">{{ item.getActivityStatusType()|title }}</span>
+                                    {% set statusClass = item.getActivityStatusType() == 'active' ? 'success' : (item.getActivityStatusType() == 'inactive' ? 'danger' : 'warning') %}
+                                    {% set statusIcon = item.getActivityStatusType() == 'active' ? 'ri-check-line' : (item.getActivityStatusType() == 'inactive' ? 'ri-close-line' : 'ri-time-line') %}
+                                    <span class="label label-{{ statusClass }}">
+                                        <i class="{{ statusIcon }} mr-1"></i>{{ item.getActivityStatusType()|title }}
+                                    </span>
                                 {% endif %}
                             </td>
-                            <td class="visible-md visible-lg">{{ item.getEventExternalId() }}</td>
+                            <td class="visible-lg">
+                                {% if item.getEventExternalId() %}
+                                    <small class="text-muted">{{ item.getEventExternalId() }}</small>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
