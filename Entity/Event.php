@@ -214,6 +214,46 @@ class Event extends CommonEntity
     private $deleted = false;
 
     /**
+     * @var string|null
+     */
+    private $eventOrganizerC;
+
+    /**
+     * @var string|null
+     */
+    private $eventRoundC;
+
+    /**
+     * @var string|null
+     */
+    private $eventManagerNameC;
+
+    /**
+     * @var string|null
+     */
+    private $eventCityC;
+
+    /**
+     * @var string|null
+     */
+    private $eventFieldC;
+
+    /**
+     * @var string|null
+     */
+    private $eventCountryC;
+
+    /**
+     * @var string|null
+     */
+    private $activityStatusType;
+
+    /**
+     * @var string|null
+     */
+    private $inviteTemplates;
+
+    /**
      * @var \DateTime|null
      */
     private $createdAt;
@@ -273,6 +313,14 @@ class Event extends CommonEntity
         $builder->addField('currencyId', Types::STRING, ['columnName' => 'currency_id', 'nullable' => true]);
         $builder->addField('budget', Types::DECIMAL, ['columnName' => 'budget', 'nullable' => true, 'precision' => 10, 'scale' => 2]);
         $builder->addField('deleted', Types::BOOLEAN, ['columnName' => 'deleted', 'nullable' => false, 'default' => false]);
+        $builder->addField('eventOrganizerC', Types::STRING, ['columnName' => 'event_organizer_c', 'nullable' => true]);
+        $builder->addField('eventRoundC', Types::STRING, ['columnName' => 'event_round_c', 'nullable' => true]);
+        $builder->addField('eventManagerNameC', Types::STRING, ['columnName' => 'event_manager_name_c', 'nullable' => true]);
+        $builder->addField('eventCityC', Types::STRING, ['columnName' => 'event_city_c', 'nullable' => true]);
+        $builder->addField('eventFieldC', Types::STRING, ['columnName' => 'event_field_c', 'nullable' => true]);
+        $builder->addField('eventCountryC', Types::STRING, ['columnName' => 'event_country_c', 'nullable' => true]);
+        $builder->addField('activityStatusType', Types::STRING, ['columnName' => 'activity_status_type', 'nullable' => true]);
+        $builder->addField('inviteTemplates', Types::STRING, ['columnName' => 'invite_templates', 'nullable' => true]);
         $builder->addField('createdAt', Types::DATETIME_MUTABLE, ['columnName' => 'created_at', 'nullable' => true]);
         $builder->addField('updatedAt', Types::DATETIME_MUTABLE, ['columnName' => 'updated_at', 'nullable' => true]);
 
@@ -336,6 +384,14 @@ class Event extends CommonEntity
                 'currencyId',
                 'budget',
                 'deleted',
+                'eventOrganizerC',
+                'eventRoundC',
+                'eventManagerNameC',
+                'eventCityC',
+                'eventFieldC',
+                'eventCountryC',
+                'activityStatusType',
+                'inviteTemplates',
             ])
             ->addProperties([
                 'createdAt',
@@ -837,6 +893,102 @@ class Event extends CommonEntity
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventOrganizerC(): ?string
+    {
+        return $this->eventOrganizerC;
+    }
+
+    public function setEventOrganizerC(?string $eventOrganizerC): self
+    {
+        $this->eventOrganizerC = $eventOrganizerC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventRoundC(): ?string
+    {
+        return $this->eventRoundC;
+    }
+
+    public function setEventRoundC(?string $eventRoundC): self
+    {
+        $this->eventRoundC = $eventRoundC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventManagerNameC(): ?string
+    {
+        return $this->eventManagerNameC;
+    }
+
+    public function setEventManagerNameC(?string $eventManagerNameC): self
+    {
+        $this->eventManagerNameC = $eventManagerNameC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventCityC(): ?string
+    {
+        return $this->eventCityC;
+    }
+
+    public function setEventCityC(?string $eventCityC): self
+    {
+        $this->eventCityC = $eventCityC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventFieldC(): ?string
+    {
+        return $this->eventFieldC;
+    }
+
+    public function setEventFieldC(?string $eventFieldC): self
+    {
+        $this->eventFieldC = $eventFieldC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getEventCountryC(): ?string
+    {
+        return $this->eventCountryC;
+    }
+
+    public function setEventCountryC(?string $eventCountryC): self
+    {
+        $this->eventCountryC = $eventCountryC;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getActivityStatusType(): ?string
+    {
+        return $this->activityStatusType;
+    }
+
+    public function setActivityStatusType(?string $activityStatusType): self
+    {
+        $this->activityStatusType = $activityStatusType;
+        $this->updatedAt = new \DateTime();
+        return $this;
+    }
+
+    public function getInviteTemplates(): ?string
+    {
+        return $this->inviteTemplates;
+    }
+
+    public function setInviteTemplates(?string $inviteTemplates): self
+    {
+        $this->inviteTemplates = $inviteTemplates;
         $this->updatedAt = new \DateTime();
         return $this;
     }

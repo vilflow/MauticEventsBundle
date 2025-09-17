@@ -94,6 +94,16 @@ final class Version_1_3_0 extends AbstractMigration
 
         // Add new boolean field
         $table->addColumn('deleted', 'boolean', ['nullable' => false, 'default' => false]);
+
+        // Add new dropdown fields
+        $table->addColumn('event_organizer_c', 'string', ['nullable' => true]);
+        $table->addColumn('event_round_c', 'string', ['nullable' => true]);
+        $table->addColumn('event_manager_name_c', 'string', ['nullable' => true]);
+        $table->addColumn('event_city_c', 'string', ['nullable' => true]);
+        $table->addColumn('event_field_c', 'string', ['nullable' => true]);
+        $table->addColumn('event_country_c', 'string', ['nullable' => true]);
+        $table->addColumn('activity_status_type', 'string', ['nullable' => true]);
+        $table->addColumn('invite_templates', 'string', ['nullable' => true]);
     }
 
     public function down(Schema $schema): void
@@ -111,7 +121,9 @@ final class Version_1_3_0 extends AbstractMigration
             'abstract_book_image_c', 'date_end', 'date_start', 'date_modified', 'date_entered',
             'early_bird_reg_deadline_c', 'event_start_date_c', 'submission_deadline_c',
             'event_end_date_c', 'early_reg_deadline_c', 'final_reg_deadline_c',
-            'currency_id', 'budget', 'deleted'
+            'currency_id', 'budget', 'deleted', 'event_organizer_c', 'event_round_c',
+            'event_manager_name_c', 'event_city_c', 'event_field_c', 'event_country_c',
+            'activity_status_type', 'invite_templates'
         ];
 
         foreach ($newFields as $field) {

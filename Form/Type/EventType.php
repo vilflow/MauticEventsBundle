@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -296,6 +297,118 @@ class EventType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'required'   => false,
+        ]);
+
+        // Dropdown fields
+        $builder->add('eventOrganizerC', ChoiceType::class, [
+            'label'      => 'Event Organizer',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Acavent' => 'Acavent',
+                'GlobalKS' => 'GlobalKS',
+                'STE' => 'STE',
+                'ProudPen' => 'ProudPen',
+            ],
+            'placeholder' => '-- Select Organizer --',
+        ]);
+
+        $builder->add('eventRoundC', ChoiceType::class, [
+            'label'      => 'Event Round',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                '1st' => '1st',
+                '2nd' => '2nd',
+                '3rd' => '3rd',
+                '4th' => '4th',
+                '5th' => '5th',
+            ],
+            'placeholder' => '-- Select Round --',
+        ]);
+
+        $builder->add('eventManagerNameC', ChoiceType::class, [
+            'label'      => 'Event Manager Name',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Romina Dellucci' => 'Romina_Dellucci',
+                'Laura Johnson' => 'Laura_Johnson',
+            ],
+            'placeholder' => '-- Select Manager --',
+        ]);
+
+        $builder->add('eventCityC', ChoiceType::class, [
+            'label'      => 'Event City',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Geneva' => 'Geneva',
+                'Prague' => 'Prague',
+                'Copenhagen' => 'Copenhagen',
+                'Berlin' => 'Berlin',
+                'Vienna' => 'Vienna',
+                'Lisbon' => 'Lisbon',
+            ],
+            'placeholder' => '-- Select City --',
+        ]);
+
+        $builder->add('eventFieldC', ChoiceType::class, [
+            'label'      => 'Event Field',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Education' => 'Education',
+                'Social Sciences' => 'Social_Sciences',
+                'Management' => 'Management',
+            ],
+            'placeholder' => '-- Select Field --',
+        ]);
+
+        $builder->add('eventCountryC', ChoiceType::class, [
+            'label'      => 'Event Country',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Switzerland' => 'Switzerland',
+                'Czech Republic' => 'Czech_Republic',
+                'Denmark' => 'Denmark',
+                'Germany' => 'Germany',
+                'Austria' => 'Austria',
+                'Portugal' => 'Portugal',
+            ],
+            'placeholder' => '-- Select Country --',
+        ]);
+
+        $builder->add('activityStatusType', ChoiceType::class, [
+            'label'      => 'Activity Status Type',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Active' => 'active',
+                'Inactive' => 'inactive',
+            ],
+            'placeholder' => '-- Select Status --',
+        ]);
+
+        $builder->add('inviteTemplates', ChoiceType::class, [
+            'label'      => 'Invite Templates',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+            'required'   => false,
+            'choices'    => [
+                'Campaign' => 'campaign',
+                'Email' => 'email',
+                'Event' => 'event',
+            ],
+            'placeholder' => '-- Select Template --',
         ]);
 
         $builder->add('buttons', FormButtonsType::class);
