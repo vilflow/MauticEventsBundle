@@ -41,51 +41,296 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
         }
 
         $choices = [
-            'event_name' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_name'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
-            ],
-            'event_city' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_city'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
-            ],
-            'event_country' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_country'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
-            ],
-            'event_currency' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_currency'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
-            ],
-            'event_website' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_website'),
-                'properties' => ['type' => 'url'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
-            ],
+            // Basic Event Information
             'event_external_id' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_external_id'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
                 'object'     => 'lead',
             ],
-            'event_suitecrm_id' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_suitecrm_id'),
+            'event_name' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_name'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
                 'object'     => 'lead',
             ],
-            'event_registration_url' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_registration_url'),
+            'event_description' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_description'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_about_event_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_about_event_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+
+            // Event URLs
+            'event_program_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_program_url_c'),
                 'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_history_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_history_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_speakers_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_speakers_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_submission_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_submission_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_faq_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_faq_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_venue_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_venue_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_visa_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_visa_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_registration_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_registration_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_facebook_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_facebook_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_feedback_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_feedback_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_testimonials_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_testimonials_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_website_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_website_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_easy_payment_url_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_easy_payment_url_c'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+
+            // Event Redirect URLs
+            'event_decline_redirect' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_decline_redirect'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_accept_redirect' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_accept_redirect'),
+                'properties' => ['type' => 'url'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+
+            // Event Contact Information
+            'event_manager_email_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_manager_email_c'),
+                'properties' => ['type' => 'email'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('email'),
+                'object'     => 'lead',
+            ],
+            'event_manager_name_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_manager_name_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_organizer_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_organizer_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+
+            // Event Details
+            'event_isbn_number_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_isbn_number_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_wire_transfer_data_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_wire_transfer_data_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_duration_minutes' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_duration_minutes'),
+                'properties' => ['type' => 'number'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
+                'object'     => 'lead',
+            ],
+            'event_duration_hours' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_duration_hours'),
+                'properties' => ['type' => 'number'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
+                'object'     => 'lead',
+            ],
+            'event_abstract_book_image_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_abstract_book_image_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+
+            // Event Dates
+            'event_date_modified' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_date_modified'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('datetime'),
+                'object'     => 'lead',
+            ],
+            'event_date_entered' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_date_entered'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('datetime'),
+                'object'     => 'lead',
+            ],
+            'event_early_bird_reg_deadline_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_early_bird_reg_deadline_c'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
+                'object'     => 'lead',
+            ],
+            'event_start_date_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_start_date_c'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
+                'object'     => 'lead',
+            ],
+            'event_submission_deadline_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_submission_deadline_c'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
+                'object'     => 'lead',
+            ],
+            'event_end_date_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_end_date_c'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
+                'object'     => 'lead',
+            ],
+            'event_early_reg_deadline_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_early_reg_deadline_c'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
+                'object'     => 'lead',
+            ],
+            'event_final_reg_deadline_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_final_reg_deadline_c'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('date'),
+                'object'     => 'lead',
+            ],
+            'event_created_at' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_created_at'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('datetime'),
+                'object'     => 'lead',
+            ],
+            'event_updated_at' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_updated_at'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('datetime'),
+                'object'     => 'lead',
+            ],
+
+            // Event Location
+            'event_city_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_city_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_country_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_country_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_field_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_field_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+
+            // Event Financial
+            'event_currency_id' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_currency_id'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_budget' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_budget'),
+                'properties' => ['type' => 'number'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
+                'object'     => 'lead',
+            ],
+
+            // Event Status
+            'event_deleted' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_deleted'),
+                'properties' => ['type' => 'boolean'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('boolean'),
+                'object'     => 'lead',
+            ],
+            'event_round_c' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_round_c'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_activity_status_type' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_activity_status_type'),
+                'properties' => ['type' => 'text'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'object'     => 'lead',
+            ],
+            'event_invite_templates' => [
+                'label'      => $this->translator->trans('mautic.events.segment.event_invite_templates'),
+                'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
                 'object'     => 'lead',
             ],
@@ -100,8 +345,19 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
     {
         // Use custom EventFieldFilterQueryBuilder for event segment filters
         $eventFields = [
-            'event_name', 'event_city', 'event_country', 'event_currency',
-            'event_website', 'event_external_id', 'event_suitecrm_id', 'event_registration_url'
+            'event_external_id', 'event_name', 'event_description', 'event_about_event_c',
+            'event_program_url_c', 'event_history_url_c', 'event_speakers_url_c', 'event_submission_url_c',
+            'event_faq_url_c', 'event_venue_url_c', 'event_visa_url_c', 'event_registration_url_c',
+            'event_facebook_url_c', 'event_feedback_url_c', 'event_testimonials_url_c', 'event_website_url_c',
+            'event_easy_payment_url_c', 'event_decline_redirect', 'event_accept_redirect',
+            'event_manager_email_c', 'event_manager_name_c', 'event_organizer_c',
+            'event_isbn_number_c', 'event_wire_transfer_data_c', 'event_duration_minutes', 'event_duration_hours',
+            'event_abstract_book_image_c', 'event_date_modified', 'event_date_entered',
+            'event_early_bird_reg_deadline_c', 'event_start_date_c', 'event_submission_deadline_c',
+            'event_end_date_c', 'event_early_reg_deadline_c', 'event_final_reg_deadline_c',
+            'event_created_at', 'event_updated_at', 'event_city_c', 'event_country_c', 'event_field_c',
+            'event_currency_id', 'event_budget', 'event_deleted', 'event_round_c',
+            'event_activity_status_type', 'event_invite_templates'
         ];
 
         foreach ($eventFields as $fieldName) {

@@ -97,6 +97,12 @@
                         }) }}
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'sessionVar': 'event',
+                            'orderBy': 'e.inviteTemplates',
+                            'text': 'mautic.form.type',
+                            'class': 'visible-lg'
+                        }) }}
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar': 'event',
                             'orderBy': 'e.activityStatusType',
                             'text': 'mautic.core.status',
                             'class': 'visible-md visible-lg'
@@ -175,6 +181,11 @@
                             <td class="visible-lg">
                                 {% if item.getEventFieldC() %}
                                     <span class="label label-success">{{ item.getEventFieldC()|replace({'_': ' '}) }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="visible-lg">
+                                {% if item.getInviteTemplates() %}
+                                    <span class="label label-default">{{ item.getInviteTemplates()|replace({'_': ' '}) }}</span>
                                 {% endif %}
                             </td>
                             <td class="visible-md visible-lg">
