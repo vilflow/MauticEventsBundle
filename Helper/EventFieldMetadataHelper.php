@@ -64,6 +64,24 @@ class EventFieldMetadataHelper
     }
 
     /**
+     * Check if a field should be rendered as text input even if it has predefined options
+     * This allows for both predefined values and free-form input
+     */
+    public function allowsFreeformInput(string $field): bool
+    {
+        // Fields that can accept both predefined values and free-form input
+        $freeformFields = [
+            'eventCityC',
+            'eventCountryC',
+            'eventManagerNameC',
+            'eventFieldC',
+            'eventOrganizerC'
+        ];
+
+        return in_array($field, $freeformFields, true);
+    }
+
+    /**
      * @return array{options:?array<string,string>, customChoiceValue:?string, optionsAttr:array<string,array<string,mixed>>}
      */
     public function getFieldOptions(string $field, string $operator, mixed $currentValue = null): array

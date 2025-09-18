@@ -12,8 +12,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Form\Type\LeadFieldsType;
+use MauticPlugin\MauticEventsBundle\Form\Type\EventFieldsType;
 
 /**
  * @extends AbstractType<mixed>
@@ -23,7 +22,7 @@ class CampaignEventEventFieldValueType extends AbstractType
     public function __construct(
         protected Translator $translator,
         protected LeadModel $leadModel,
-        protected FieldModel $fieldModel,
+        protected EventFieldMetadataHelper $eventFieldMetadataHelper,
         
     ) {
     }
@@ -32,17 +31,16 @@ class CampaignEventEventFieldValueType extends AbstractType
     {
         $builder->add(
             'field',
-            LeadFieldsType::class,
+            EventFieldsType::class,
             [
                 'label'                 => 'mautic.lead.campaign.event.field',
                 'label_attr'            => ['class' => 'control-label'],
                 'multiple'              => false,
-                'with_company_fields'   => true,
                 'placeholder'           => 'mautic.core.select',
                 'attr'                  => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.lead.campaign.event.field_descr',
-                    'onchange' => 'Mautic.updateLeadFieldValues(this)',
+                    'onchange' => 'Mautic.updateEventFieldValues(this)',
                 ],
                 'required'    => true,
                 'constraints' => [
@@ -64,68 +62,28 @@ class CampaignEventEventFieldValueType extends AbstractType
             $operator    = '=';
 
             if (isset($data['field'])) {
-                $field    = $this->fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
-                $operator = $data['operator'];
+                $selectedField = $data['field'];
+                $operator = $data['operator'] ?? '=';
 
-                if ($field) {
-                    $properties = $field->getProperties();
-                    $fieldType  = $field->getType();
-                    if (!empty($properties['list'])) {
-                        // Lookup/Select options
-                        $fieldValues = FormFieldHelper::parseList($properties['list']);
-                    } elseif (!empty($properties) && 'boolean' == $fieldType) {
-                        // Boolean options
-                        $fieldValues = [
-                            0 => $properties['no'],
-                            1 => $properties['yes'],
-                        ];
-                    } else {
-                        switch ($fieldType) {
-                            case 'country':
-                                $fieldValues = FormFieldHelper::getCountryChoices();
-                                break;
-                            case 'region':
-                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getRegionChoices());
-                                break;
-                            case 'timezone':
-                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getTimezonesChoices());
-                                break;
-                            case 'locale':
-                                // Locales are flipped. And yes, we will flip the array again below.
-                                $fieldValues = array_flip(FormFieldHelper::getLocaleChoices());
-                                break;
-                            case 'date':
-                            case 'datetime':
-                                if ('date' === $operator) {
-                                    $fieldHelper = new FormFieldHelper();
-                                    $fieldHelper->setTranslator($this->translator);
-                                    $fieldValues = $fieldHelper->getDateChoices();
-                                    $customText  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
-                                    $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
-                                    $fieldValues = array_merge(
-                                        [
-                                            $customValue => $customText,
-                                        ],
-                                        $fieldValues
-                                    );
+                $fieldType = $this->eventFieldMetadataHelper->getFieldType($selectedField);
 
-                                    $choiceAttr = function ($value, $key, $index) use ($customValue): array {
-                                        if ($customValue === $value) {
-                                            return ['data-custom' => 1];
-                                        }
-
-                                        return [];
-                                    };
-                                }
-                                break;
-                            case 'boolean':
-                            case 'lookup':
-                            case 'select':
-                            case 'radio':
-                                if (!empty($properties)) {
-                                    $fieldValues = $properties;
-                                }
-                        }
+                $currentValue = $data['value'] ?? null;
+                $optionsMeta = $this->eventFieldMetadataHelper->getFieldOptions($selectedField, $operator, $currentValue);
+                if (!empty($optionsMeta['options'])) {
+                    $fieldValues = $optionsMeta['options'];
+                    $customChoiceValue = $optionsMeta['customChoiceValue'];
+                    $optionsAttr = $optionsMeta['optionsAttr'];
+                    if (null !== $customChoiceValue) {
+                        $choiceAttr = function ($value, $key, $index) use ($customChoiceValue, $optionsAttr): array {
+                            if ($customChoiceValue === $value) {
+                                return ['data-custom' => 1];
+                            }
+                            return $optionsAttr[$value] ?? [];
+                        };
+                    } elseif (!empty($optionsAttr)) {
+                        $choiceAttr = function ($value, $key, $index) use ($optionsAttr): array {
+                            return $optionsAttr[$value] ?? [];
+                        };
                     }
                 }
             }
@@ -133,23 +91,59 @@ class CampaignEventEventFieldValueType extends AbstractType
             $supportsValue   = !in_array($operator, ['empty', '!empty']);
             $supportsChoices = !in_array($operator, ['empty', '!empty', 'regexp', '!regexp']);
 
+            // Check if field allows freeform input and current value
+            $rawSubmittedValue = $data['value'] ?? null;
+            $hasCurrentValue = !(
+                null === $rawSubmittedValue
+                || (is_string($rawSubmittedValue) && '' === $rawSubmittedValue)
+                || (is_array($rawSubmittedValue) && [] === $rawSubmittedValue)
+            );
+            $allowsFreeform = isset($data['field']) && $this->eventFieldMetadataHelper->allowsFreeformInput($data['field']);
+
             // Display selectbox for a field with choices, textbox for others
-            if (!empty($fieldValues) && $supportsChoices) {
+            // For fields that allow freeform input, only show dropdown if there's a current value that matches predefined options
+            if ((!empty($fieldValues) || 'select' === $fieldType) && $supportsChoices) {
+                $valueMatchesPredefinedOptions = static function ($value) use ($fieldValues): bool {
+                    if (is_array($value)) {
+                        foreach ($value as $item) {
+                            if (!isset($fieldValues[$item ?? ''])) {
+                                return false;
+                            }
+                        }
+
+                        return [] !== $value;
+                    }
+
+                    return isset($fieldValues[$value ?? '']);
+                };
+
+                if ($allowsFreeform && $hasCurrentValue && !$valueMatchesPredefinedOptions($rawSubmittedValue)) {
+                    $shouldShowAsText = true;
+                } else {
+                    $shouldShowAsText = false;
+                }
+            } else {
+                $shouldShowAsText = true;
+            }
+
+            if (!$shouldShowAsText && ((!empty($fieldValues) || 'select' === $fieldType) && $supportsChoices)) {
                 $multiple = in_array($operator, ['in', '!in']);
-                $value    = $multiple && !is_array($data['value']) ? [$data['value']] : $data['value'];
+                $rawValue = $data['value'] ?? null;
+                $value    = $multiple && !is_array($rawValue) ? (null !== $rawValue ? [$rawValue] : []) : $rawValue;
 
                 $form->add(
                     'value',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($fieldValues),
+                        // Symfony expects 'label' => 'value'
+                        'choices'           => !empty($fieldValues) ? array_flip($fieldValues) : [],
                         'label'             => 'mautic.form.field.form.value',
                         'label_attr'        => ['class' => 'control-label'],
                         'attr'              => [
                             'class'                => 'form-control',
-                            'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
+                            'onchange'             => 'Mautic.updateEventFieldValueOptions(this)',
                             'data-toggle'          => $fieldType,
-                            'data-onload-callback' => 'updateLeadFieldValueOptions',
+                            'data-onload-callback' => 'updateEventFieldValueOptions',
                         ],
                         'choice_attr' => $choiceAttr,
                         'required'    => true,
@@ -166,8 +160,14 @@ class CampaignEventEventFieldValueType extends AbstractType
                 $attr = [
                     'class'                => 'form-control',
                     'data-toggle'          => $fieldType,
-                    'data-onload-callback' => 'updateLeadFieldValueOptions',
+                    'data-onload-callback' => 'updateEventFieldValueOptions',
                 ];
+
+                // Add datalist support for freeform fields with predefined options
+                if ($allowsFreeform && !empty($fieldValues)) {
+                    $attr['list'] = 'event_field_options_' . ($data['field'] ?? '');
+                    $attr['data-options'] = json_encode(array_values($fieldValues));
+                }
 
                 if (!$supportsValue) {
                     $attr['disabled'] = 'disabled';
@@ -197,7 +197,7 @@ class CampaignEventEventFieldValueType extends AbstractType
                     'label'             => 'mautic.lead.lead.submitaction.operator',
                     'label_attr'        => ['class' => 'control-label'],
                     'attr'              => [
-                        'onchange' => 'Mautic.updateLeadFieldValues(this)',
+                        'onchange' => 'Mautic.updateEventFieldValues(this)',
                     ],
                 ]
             );

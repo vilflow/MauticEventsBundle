@@ -217,4 +217,26 @@ class EventContactRepository extends CommonRepository
 
         return $qb->getQuery()->getOneOrNullResult() !== null;
     }
+
+    public function contactHasEventByField(int $contactId, string $field, string $operator, string $value): bool
+    {
+        switch ($field) {
+            case 'name':
+                return $this->contactHasEventByName($contactId, $value);
+            case 'city':
+                return $this->contactHasEventByCity($contactId, $operator, $value);
+            case 'country':
+                return $this->contactHasEventByCountry($contactId, $operator, $value);
+            case 'currency':
+                return $this->contactHasEventByCurrency($contactId, $operator, $value);
+            case 'externalId':
+                return $this->contactHasEventByExternalId($contactId, $operator, $value);
+            case 'website':
+                return $this->contactHasEventByWebsite($contactId, $operator, $value);
+            case 'suitecrmId':
+                return $this->contactHasEventBySuitecrmId($contactId, $operator, $value);
+            default:
+                return false;
+        }
+    }
 }
