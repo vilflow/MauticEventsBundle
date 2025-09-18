@@ -1,0 +1,101 @@
+{% block _campaignevent_properties_row %}
+<div class="row condition-row">
+    <div class="col-xs-4">
+        {{ form_row(form.field) }}
+    </div>
+    <div class="col-xs-4">
+        {{ form_row(form.operator) }}
+    </div>
+    <div class="col-xs-4">
+        {{ form_row(form.value) }}
+    </div>
+</div>
+
+<div class="row condition-custom-date-row" style="display: none;">
+    <div class="col-sm-offset-4 col-sm-4">
+        <div class="row">
+            <div class="form-group col-xs-12">
+                <div class="input-group">
+                    <span class="input-group-addon preaddon">
+                        <i class="symbol-hashtag"></i>
+                    </span>
+                    <input autocomplete="false" type="number" id="event-field-custom-date-interval" class="form-control" value="1" onchange="Mautic.updateEventFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="row">
+            <div class="form-group col-xs-12">
+                <select id="event-field-custom-date-unit" class="form-control chosen" autocomplete="false" onchange="Mautic.updateEventFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
+                    {% for interval in ['i', 'h', 'd', 'm', 'y'] %}
+                        <option {% if 'd' == interval %}selected{% endif %} value="{{ interval }}">
+                            {{ ('mautic.campaign.event.intervalunit.choice.' ~ interval)|trans }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (typeof Mautic.updateEventFieldValues === 'undefined') {
+        Mautic.updateEventFieldValues = function (field) {
+            mQuery('.condition-custom-date-row').hide();
+            Mautic.updateFieldOperatorValue(field, 'events:updateEventFieldValues', Mautic.updateEventFieldValueOptions, [true]);
+
+            var fieldId = mQuery(field).attr('id');
+            var fieldPrefix = fieldId.slice(0, -5);
+            setTimeout(function () {
+                mQuery('#' + fieldPrefix + 'operator').attr('onchange', 'Mautic.updateEventFieldValues(this)');
+            }, 0);
+        };
+
+        Mautic.updateEventFieldValueOptions = function (field, updating) {
+            var fieldId = mQuery(field).attr('id');
+            var fieldPrefix = fieldId.slice(0, -5);
+
+            if ('date' === mQuery('#' + fieldPrefix + 'operator').val()) {
+                var customOption = mQuery(field).find('option[data-custom=1]');
+                var value = mQuery(field).val();
+                var customSelected = mQuery(customOption).prop('selected');
+
+                if (customSelected) {
+                    if (!updating) {
+                        var regex = /(\+|-)(PT?)([0-9]*)([DMHY])$/g;
+                        var match = regex.exec(value);
+                        if (match) {
+                            var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
+                            var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+
+                            mQuery('#event-field-custom-date-interval').val(interval);
+                            mQuery('#event-field-custom-date-unit').val(unit.toLowerCase());
+                        }
+                    } else {
+                        var interval = mQuery('#event-field-custom-date-interval').val();
+                        var unit = mQuery('#event-field-custom-date-unit').val();
+
+                        var prefix = ('i' === unit || 'h' === unit) ? 'PT' : 'P';
+                        if ('i' === unit) {
+                            unit = 'm';
+                        }
+
+                        unit = unit.toUpperCase();
+
+                        var operator = parseInt(interval, 10) < 0 ? '-' : '+';
+                        interval = Math.abs(parseInt(interval, 10));
+                        var newValue = operator + prefix + interval + unit;
+                        customOption.attr('value', newValue);
+                    }
+                    mQuery('.condition-custom-date-row').show();
+                } else {
+                    mQuery('.condition-custom-date-row').hide();
+                }
+            } else {
+                mQuery('.condition-custom-date-row').hide();
+            }
+        };
+    }
+</script>
+{% endblock %}

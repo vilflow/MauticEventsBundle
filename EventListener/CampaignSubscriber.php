@@ -7,13 +7,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use MauticPlugin\MauticEventsBundle\Entity\EventContactRepository;
 use MauticPlugin\MauticEventsBundle\MauticEventsEvents;
-use MauticPlugin\MauticEventsBundle\Form\Type\HasEventNameConditionType;
-use MauticPlugin\MauticEventsBundle\Form\Type\EventCityConditionType;
-use MauticPlugin\MauticEventsBundle\Form\Type\EventCountryConditionType;
-use MauticPlugin\MauticEventsBundle\Form\Type\EventCurrencyConditionType;
-use MauticPlugin\MauticEventsBundle\Form\Type\EventExternalIdConditionType;
-use MauticPlugin\MauticEventsBundle\Form\Type\EventSuitecrmIdConditionType;
-use MauticPlugin\MauticEventsBundle\Form\Type\EventWebsiteConditionType;
+use MauticPlugin\MauticEventsBundle\Form\Type\CampaignEventEventFieldValueType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -33,68 +27,15 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
-        // Event Name Condition
+        // Event Field Value Condition
         $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_name',
-            'description' => 'mautic.events.campaign.condition.has_event_name_descr',
-            'formType'    => HasEventNameConditionType::class,
+            'label'       => 'mautic.events.campaign.condition.event_field_value',
+            'description' => 'mautic.events.campaign.condition.event_field_value_descr',
+            'formType'    => CampaignEventEventFieldValueType::class,
+            'formTheme'   => '@MauticEvents/FormTheme/FieldValueCondition/_campaignevent_event_field_value_widget.html.twig',
             'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
-        $event->addCondition('events.has_event_name', $condition);
-
-        // Event City Condition
-        $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_city',
-            'description' => 'mautic.events.campaign.condition.has_event_city_descr',
-            'formType'    => EventCityConditionType::class,
-            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        ];
-        $event->addCondition('events.has_event_city', $condition);
-
-        // Event Country Condition
-        $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_country',
-            'description' => 'mautic.events.campaign.condition.has_event_country_descr',
-            'formType'    => EventCountryConditionType::class,
-            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        ];
-        $event->addCondition('events.has_event_country', $condition);
-
-        // Event Currency Condition
-        $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_currency',
-            'description' => 'mautic.events.campaign.condition.has_event_currency_descr',
-            'formType'    => EventCurrencyConditionType::class,
-            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        ];
-        $event->addCondition('events.has_event_currency', $condition);
-
-        // Event External ID Condition
-        $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_external_id',
-            'description' => 'mautic.events.campaign.condition.has_event_external_id_descr',
-            'formType'    => EventExternalIdConditionType::class,
-            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        ];
-        $event->addCondition('events.has_event_external_id', $condition);
-
-        // Event Website Condition
-        $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_website',
-            'description' => 'mautic.events.campaign.condition.has_event_website_descr',
-            'formType'    => EventWebsiteConditionType::class,
-            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        ];
-        $event->addCondition('events.has_event_website', $condition);
-
-        // Event SuiteCRM ID Condition
-        $condition = [
-            'label'       => 'mautic.events.campaign.condition.has_event_suitecrm_id',
-            'description' => 'mautic.events.campaign.condition.has_event_suitecrm_id_descr',
-            'formType'    => EventSuitecrmIdConditionType::class,
-            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        ];
-        $event->addCondition('events.has_event_suitecrm_id', $condition);
+        $event->addCondition('events.field_value', $condition);
     }
 
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
@@ -107,87 +48,25 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $config = $event->getConfig();
 
-        // Event Name Condition
-        if ($event->checkContext('events.has_event_name')) {
-            $eventName = $config['event_name'] ?? '';
-            if (empty($eventName)) {
-                $event->setResult(false);
-                return;
-            }
-            $hasEvent = $this->eventContactRepository->contactHasEventByName($lead->getId(), $eventName);
-            $event->setResult($hasEvent);
-            return;
-        }
-
-        // Event City Condition
-        if ($event->checkContext('events.has_event_city')) {
-            $city = $config['city'] ?? '';
-            if (empty($city)) {
-                $event->setResult(false);
-                return;
-            }
-            $hasEvent = $this->eventContactRepository->contactHasEventByCity($lead->getId(), 'eq', $city);
-            $event->setResult($hasEvent);
-            return;
-        }
-
-        // Event Country Condition
-        if ($event->checkContext('events.has_event_country')) {
+        // Event Field Value Condition
+        if ($event->checkContext('events.field_value')) {
+            $field = $config['field'] ?? '';
             $operator = $config['operator'] ?? 'eq';
-            $country = $config['country'] ?? '';
-            if (empty($country)) {
-                $event->setResult(false);
-                return;
-            }
-            $hasEvent = $this->eventContactRepository->contactHasEventByCountry($lead->getId(), $operator, $country);
-            $event->setResult($hasEvent);
-            return;
-        }
+            $value = $config['value'] ?? '';
 
-        // Event Currency Condition
-        if ($event->checkContext('events.has_event_currency')) {
-            $currency = $config['currency'] ?? '';
-            if (empty($currency)) {
+            if (empty($field)) {
                 $event->setResult(false);
                 return;
             }
-            $hasEvent = $this->eventContactRepository->contactHasEventByCurrency($lead->getId(), 'eq', $currency);
-            $event->setResult($hasEvent);
-            return;
-        }
 
-        // Event External ID Condition
-        if ($event->checkContext('events.has_event_external_id')) {
-            $externalId = $config['external_id'] ?? '';
-            if (empty($externalId)) {
+            // Check if value is required for this operator
+            $operatorsWithoutValue = ['empty', '!empty'];
+            if (!in_array($operator, $operatorsWithoutValue) && empty($value)) {
                 $event->setResult(false);
                 return;
             }
-            $hasEvent = $this->eventContactRepository->contactHasEventByExternalId($lead->getId(), 'eq', $externalId);
-            $event->setResult($hasEvent);
-            return;
-        }
 
-        // Event Website Condition
-        if ($event->checkContext('events.has_event_website')) {
-            $website = $config['website'] ?? '';
-            if (empty($website)) {
-                $event->setResult(false);
-                return;
-            }
-            $hasEvent = $this->eventContactRepository->contactHasEventByWebsite($lead->getId(), 'eq', $website);
-            $event->setResult($hasEvent);
-            return;
-        }
-
-        // Event SuiteCRM ID Condition
-        if ($event->checkContext('events.has_event_suitecrm_id')) {
-            $suitecrmId = $config['suitecrm_id'] ?? '';
-            if (empty($suitecrmId)) {
-                $event->setResult(false);
-                return;
-            }
-            $hasEvent = $this->eventContactRepository->contactHasEventBySuitecrmId($lead->getId(), 'eq', $suitecrmId);
+            $hasEvent = $this->eventContactRepository->contactHasEventByField($lead->getId(), $field, $operator, $value);
             $event->setResult($hasEvent);
             return;
         }
