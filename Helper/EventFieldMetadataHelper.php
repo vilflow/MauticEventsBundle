@@ -63,6 +63,11 @@ class EventFieldMetadataHelper
         return 'text';
     }
 
+    public function sanitizeFieldAlias(string $field): string
+    {
+        return (string) preg_replace('/[^A-Za-z0-9_]/', '', $field);
+    }
+
     /**
      * Check if a field should be rendered as text input even if it has predefined options
      * This allows for both predefined values and free-form input

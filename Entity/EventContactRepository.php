@@ -3,13 +3,29 @@
 namespace MauticPlugin\MauticEventsBundle\Entity;
 
 use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use MauticPlugin\MauticEventsBundle\Helper\EventFieldMetadataHelper;
 
 /**
  * @extends CommonRepository<EventContact>
  */
 class EventContactRepository extends CommonRepository
 {
+    private const LEGACY_FIELD_MAP = [
+        'city'      => 'eventCityC',
+        'country'   => 'eventCountryC',
+        'currency'  => 'currencyId',
+        'externalId'=> 'eventExternalId',
+        'website'   => 'websiteUrlC',
+    ];
+
+    public function __construct(ManagerRegistry $registry, private EventFieldMetadataHelper $fieldMetadataHelper)
+    {
+        parent::__construct($registry, EventContact::class);
+    }
+
     public function getTableAlias(): string
     {
         return 'ec';
@@ -218,25 +234,142 @@ class EventContactRepository extends CommonRepository
         return $qb->getQuery()->getOneOrNullResult() !== null;
     }
 
-    public function contactHasEventByField(int $contactId, string $field, string $operator, string $value): bool
+    public function contactHasEventByField(int $contactId, string $field, string $operator, mixed $value): bool
     {
+        $normalizedField = $this->normalizeFieldName($field);
+
+        if (null !== $normalizedField) {
+            return $this->contactHasEventByGenericField($contactId, $normalizedField, $operator, $value);
+        }
+
         switch ($field) {
-            case 'name':
-                return $this->contactHasEventByName($contactId, $value);
-            case 'city':
-                return $this->contactHasEventByCity($contactId, $operator, $value);
-            case 'country':
-                return $this->contactHasEventByCountry($contactId, $operator, $value);
-            case 'currency':
-                return $this->contactHasEventByCurrency($contactId, $operator, $value);
-            case 'externalId':
-                return $this->contactHasEventByExternalId($contactId, $operator, $value);
-            case 'website':
-                return $this->contactHasEventByWebsite($contactId, $operator, $value);
             case 'suitecrmId':
-                return $this->contactHasEventBySuitecrmId($contactId, $operator, $value);
+                return $this->contactHasEventBySuitecrmId($contactId, $operator, (string) $value);
             default:
                 return false;
+        }
+    }
+
+    private function normalizeFieldName(string $field): ?string
+    {
+        $field = $this->fieldMetadataHelper->sanitizeFieldAlias(trim($field));
+
+        if (isset(self::LEGACY_FIELD_MAP[$field])) {
+            $field = self::LEGACY_FIELD_MAP[$field];
+        }
+
+        $metadata = $this->_em->getClassMetadata(Event::class);
+
+        return $metadata->hasField($field) ? $field : null;
+    }
+
+    private function contactHasEventByGenericField(int $contactId, string $field, string $operator, mixed $value): bool
+    {
+        $qb = $this->createQueryBuilder('ec')
+            ->select('COUNT(ec.id)')
+            ->innerJoin('ec.event', 'e')
+            ->andWhere('IDENTITY(ec.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER);
+
+        $column = 'e.' . $field;
+
+        $this->applyOperatorToQuery($qb, $column, $operator, $value);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    private function applyOperatorToQuery(QueryBuilder $qb, string $column, string $operator, mixed $value): void
+    {
+        $parameter = 'value';
+
+        $trimmedValue = is_string($value) ? trim($value) : $value;
+
+        switch ($operator) {
+            case 'eq':
+                $qb->andWhere($column.' = :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'neq':
+                $qb->andWhere('('.$column.' != :'.$parameter.' OR '.$column.' IS NULL)')
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'like':
+                $qb->andWhere($column.' LIKE :'.$parameter)
+                    ->setParameter($parameter, '%'.$trimmedValue.'%');
+                break;
+            case '!like':
+                $qb->andWhere($column.' NOT LIKE :'.$parameter)
+                    ->setParameter($parameter, '%'.$trimmedValue.'%');
+                break;
+            case 'contains':
+                $qb->andWhere($column.' LIKE :'.$parameter)
+                    ->setParameter($parameter, '%'.$trimmedValue.'%');
+                break;
+            case 'startsWith':
+                $qb->andWhere($column.' LIKE :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue.'%');
+                break;
+            case 'endsWith':
+                $qb->andWhere($column.' LIKE :'.$parameter)
+                    ->setParameter($parameter, '%'.$trimmedValue);
+                break;
+            case 'gt':
+                $qb->andWhere($column.' > :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'gte':
+                $qb->andWhere($column.' >= :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'lt':
+                $qb->andWhere($column.' < :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'lte':
+                $qb->andWhere($column.' <= :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'in':
+                $values = is_array($trimmedValue) ? $trimmedValue : array_map('trim', explode(',', (string) $trimmedValue));
+                $values = array_values(array_filter($values, static fn($item) => $item !== '' && $item !== null));
+                if (empty($values)) {
+                    $qb->andWhere('1 = 0');
+                    break;
+                }
+                $qb->andWhere($column.' IN (:'.$parameter.')')
+                    ->setParameter($parameter, $values);
+                break;
+            case '!in':
+                $values = is_array($trimmedValue) ? $trimmedValue : array_map('trim', explode(',', (string) $trimmedValue));
+                $values = array_values(array_filter($values, static fn($item) => $item !== '' && $item !== null));
+                if (empty($values)) {
+                    break;
+                }
+                $qb->andWhere($column.' NOT IN (:'.$parameter.')')
+                    ->setParameter($parameter, $values);
+                break;
+            case 'empty':
+                $qb->andWhere('('.$column.' IS NULL OR '.$column." = '' )");
+                break;
+            case '!empty':
+                $qb->andWhere($column.' IS NOT NULL')
+                    ->andWhere($column." != ''");
+                break;
+            case 'regexp':
+                $qb->andWhere($column.' REGEXP :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case '!regexp':
+                $qb->andWhere($column.' NOT REGEXP :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            case 'date':
+                $qb->andWhere($column.' = :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
+                break;
+            default:
+                $qb->andWhere($column.' = :'.$parameter)
+                    ->setParameter($parameter, $trimmedValue);
         }
     }
 }
