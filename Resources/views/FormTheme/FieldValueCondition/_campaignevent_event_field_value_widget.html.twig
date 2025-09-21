@@ -43,7 +43,7 @@
     if (typeof Mautic.updateEventFieldValues === 'undefined') {
         Mautic.updateEventFieldValues = function (field) {
             mQuery('.condition-custom-date-row').hide();
-            Mautic.updateFieldOperatorValue(field, 'events:updateEventFieldValues', Mautic.updateEventFieldValueOptions, [true]);
+            Mautic.updateFieldOperatorValue(field, 'plugin:events:updateEventFieldValues', Mautic.updateEventFieldValueOptions, [true]);
 
             var fieldId = mQuery(field).attr('id');
             var fieldPrefix = fieldId.slice(0, -5);
