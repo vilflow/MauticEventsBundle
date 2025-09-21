@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\MauticEventsBundle\Helper\EventFieldMetadataHelper;
+use MauticPlugin\MauticOpportunitiesBundle\Entity\Opportunity;
 
 /**
  * @extends CommonRepository<EventContact>
@@ -265,14 +266,22 @@ class EventContactRepository extends CommonRepository
 
     private function contactHasEventByGenericField(int $contactId, string $field, string $operator, mixed $value): bool
     {
-        $qb = $this->createQueryBuilder('ec')
-            ->select('COUNT(ec.id)')
-            ->innerJoin('ec.event', 'e')
-            ->andWhere('IDENTITY(ec.contact) = :contactId')
+        // Check via opportunities only. This ensures the event is linked to one of the contact's opportunities.
+        return $this->contactHasEventViaOpportunity($contactId, $field, $operator, $value);
+    }
+
+    private function contactHasEventViaOpportunity(int $contactId, string $field, string $operator, mixed $value): bool
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->select('COUNT(o.id)')
+            ->from(Opportunity::class, 'o')
+            ->innerJoin('o.event', 'e')
+            ->andWhere('o.contact = :contactId')
+            ->andWhere('o.event IS NOT NULL')
+            ->andWhere('o.deleted = 0')
             ->setParameter('contactId', $contactId, ParameterType::INTEGER);
 
         $column = 'e.' . $field;
-
         $this->applyOperatorToQuery($qb, $column, $operator, $value);
 
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
