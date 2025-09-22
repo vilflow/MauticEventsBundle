@@ -7,8 +7,8 @@
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
         item: event,
         templateButtons: {
-            edit: is_granted('events:events:edit'),
-            delete: is_granted('events:events:delete')
+            edit: permissions['events:events:edit']|default(false),
+            delete: permissions['events:events:delete']|default(false)
         },
         routeBase: 'event'
     }) }}
