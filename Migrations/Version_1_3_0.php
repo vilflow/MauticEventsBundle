@@ -112,7 +112,7 @@ final class Version_1_3_0 extends AbstractMigration
             'event_program_url_c', 'history_url_c', 'event_speakers_url_c', 'submission_url_c',
             'event_faq_url_c', 'event_venue_url_c', 'visa_url_c', 'registration_url_c',
             'event_facebook_url_c', 'event_feedback_url_c', 'event_testimonials_url_c',
-            'website_url_c', 'easy_payment_url_c', 'decline_redirect', 'accept_redirect',
+            'event_website_url_c', 'easy_payment_url_c', 'decline_redirect', 'accept_redirect',
             'event_manager_email_c', 'isbn_number_c', 'event_wire_transfer_data_c',
             'about_event_c', 'description', 'duration_minutes', 'duration_hours',
             'abstract_book_image_c', 'date_modified', 'date_entered',

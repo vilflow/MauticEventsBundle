@@ -90,7 +90,7 @@ class EventApiController extends CommonApiController
             'event_facebook_url_c' => 'eventFacebookUrlC',
             'event_feedback_url_c' => 'eventFeedbackUrlC',
             'event_testimonials_url_c' => 'eventTestimonialsUrlC',
-            'website_url_c' => 'websiteUrlC',
+            'event_website_url_c' => 'eventWebsiteUrlC',
             'easy_payment_url_c' => 'easyPaymentUrlC',
             'decline_redirect' => 'declineRedirect',
             'accept_redirect' => 'acceptRedirect',

@@ -19,7 +19,7 @@ class EventContactRepository extends CommonRepository
         'country'   => 'eventCountryC',
         'currency'  => 'currencyId',
         'externalId'=> 'eventExternalId',
-        'website'   => 'websiteUrlC',
+        'website'   => 'eventWebsiteUrlC',
     ];
 
     public function __construct(ManagerRegistry $registry, private EventFieldMetadataHelper $fieldMetadataHelper)

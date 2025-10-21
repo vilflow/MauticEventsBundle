@@ -135,7 +135,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
             ],
             'event_website_url_c' => [
-                'label'      => $this->translator->trans('mautic.events.segment.event_website_url_c'),
+                'label'      => $this->translator->trans('mautic.events.segment.event_website_url_c') . ' (Legacy)',
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
                 'object'     => 'lead',
@@ -348,7 +348,8 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             'event_external_id', 'event_name', 'event_description', 'event_about_event_c',
             'event_program_url_c', 'event_history_url_c', 'event_speakers_url_c', 'event_submission_url_c',
             'event_faq_url_c', 'event_venue_url_c', 'event_visa_url_c', 'event_registration_url_c',
-            'event_facebook_url_c', 'event_feedback_url_c', 'event_testimonials_url_c', 'event_website_url_c',
+            'event_facebook_url_c', 'event_feedback_url_c', 'event_testimonials_url_c',
+            'event_website_url_c',  // Legacy field name support
             'event_easy_payment_url_c', 'event_decline_redirect', 'event_accept_redirect',
             'event_manager_email_c', 'event_manager_name_c', 'event_organizer_c',
             'event_isbn_number_c', 'event_wire_transfer_data_c', 'event_duration_minutes', 'event_duration_hours',

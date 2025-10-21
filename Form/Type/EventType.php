@@ -121,7 +121,7 @@ class EventType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('websiteUrlC', UrlType::class, [
+        $builder->add('eventWebsiteUrlC', UrlType::class, [
             'label'      => 'Website Url',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],

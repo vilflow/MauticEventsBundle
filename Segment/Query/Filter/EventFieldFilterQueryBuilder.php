@@ -93,6 +93,7 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     private function mapFilterFieldToColumn(string $field): string
     {
         // Map segment filter field names to actual database column names
+        // Some DB columns have 'event_' prefix, others don't - this maps filter names to actual column names
         $fieldMap = [
             'event_name' => 'name',
             'event_city' => 'city',
@@ -102,6 +103,21 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             'event_external_id' => 'event_external_id',
             'event_suitecrm_id' => 'suitecrm_id',
             'event_registration_url' => 'registration_url',
+
+            // URL fields that have event_ prefix in filter but not in database
+            'event_history_url_c' => 'history_url_c',
+            'event_submission_url_c' => 'submission_url_c',
+            'event_visa_url_c' => 'visa_url_c',
+            'event_registration_url_c' => 'registration_url_c',
+            'event_website_url_c' => 'website_url_c',  // Handle legacy filter name
+
+            // Location fields
+            'event_city_c' => 'city_c',
+            'event_country_c' => 'country_c',
+
+            // Redirect fields
+            'event_decline_redirect' => 'decline_redirect',
+            'event_accept_redirect' => 'accept_redirect',
         ];
 
         return $fieldMap[$field] ?? $field;

@@ -91,7 +91,7 @@ class Event extends CommonEntity
     /**
      * @var string|null
      */
-    private $websiteUrlC;
+    private $eventWebsiteUrlC;
 
     /**
      * @var string|null
@@ -279,7 +279,7 @@ class Event extends CommonEntity
         $builder->addField('eventFacebookUrlC', Types::STRING, ['columnName' => 'event_facebook_url_c', 'nullable' => true]);
         $builder->addField('eventFeedbackUrlC', Types::STRING, ['columnName' => 'event_feedback_url_c', 'nullable' => true]);
         $builder->addField('eventTestimonialsUrlC', Types::STRING, ['columnName' => 'event_testimonials_url_c', 'nullable' => true]);
-        $builder->addField('websiteUrlC', Types::STRING, ['columnName' => 'website_url_c', 'nullable' => true]);
+        $builder->addField('eventWebsiteUrlC', Types::STRING, ['columnName' => 'event_website_url_c', 'nullable' => true]);
         $builder->addField('easyPaymentUrlC', Types::STRING, ['columnName' => 'easy_payment_url_c', 'nullable' => true]);
         $builder->addField('declineRedirect', Types::STRING, ['columnName' => 'decline_redirect', 'nullable' => true]);
         $builder->addField('acceptRedirect', Types::STRING, ['columnName' => 'accept_redirect', 'nullable' => true]);
@@ -348,7 +348,7 @@ class Event extends CommonEntity
                 'eventFacebookUrlC',
                 'eventFeedbackUrlC',
                 'eventTestimonialsUrlC',
-                'websiteUrlC',
+                'eventWebsiteUrlC',
                 'easyPaymentUrlC',
                 'declineRedirect',
                 'acceptRedirect',
@@ -588,12 +588,12 @@ class Event extends CommonEntity
 
     public function getWebsiteUrlC(): ?string
     {
-        return $this->websiteUrlC;
+        return $this->eventWebsiteUrlC;
     }
 
-    public function setWebsiteUrlC(?string $websiteUrlC): self
+    public function setWebsiteUrlC(?string $eventWebsiteUrlC): self
     {
-        $this->websiteUrlC = $websiteUrlC;
+        $this->eventWebsiteUrlC = $eventWebsiteUrlC;
         $this->updatedAt = new \DateTime();
         return $this;
     }

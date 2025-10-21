@@ -46,7 +46,7 @@ class EventFieldsType extends AbstractType
             'mautic.events.segment.event_facebook_url_c' => 'eventFacebookUrlC',
             'mautic.events.segment.event_feedback_url_c' => 'eventFeedbackUrlC',
             'mautic.events.segment.event_testimonials_url_c' => 'eventTestimonialsUrlC',
-            'mautic.events.segment.event_website_url_c' => 'websiteUrlC',
+            'mautic.events.segment.event_website_url_c' => 'eventWebsiteUrlC',
             'mautic.events.segment.event_easy_payment_url_c' => 'easyPaymentUrlC',
 
             // Redirect URLs
