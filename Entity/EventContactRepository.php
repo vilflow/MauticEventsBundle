@@ -255,6 +255,9 @@ class EventContactRepository extends CommonRepository
     {
         $field = $this->fieldMetadataHelper->sanitizeFieldAlias(trim($field));
 
+        // Map from segment-style field names (event_xxx) to entity property names (xxxC/xxx)
+        $field = $this->mapSegmentFieldToEntityProperty($field);
+
         if (isset(self::LEGACY_FIELD_MAP[$field])) {
             $field = self::LEGACY_FIELD_MAP[$field];
         }
@@ -264,10 +267,80 @@ class EventContactRepository extends CommonRepository
         return $metadata->hasField($field) ? $field : null;
     }
 
+    private function mapSegmentFieldToEntityProperty(string $field): string
+    {
+        // Map segment filter field names (with event_ prefix) to entity property names
+        $segmentToEntityMap = [
+            'event_name' => 'name',
+            'event_description' => 'description',
+            'event_about_event_c' => 'aboutEventC',
+            'event_external_id' => 'eventExternalId',
+            'event_program_url_c' => 'eventProgramUrlC',
+            'event_history_url_c' => 'historyUrlC',
+            'event_speakers_url_c' => 'eventSpeakersUrlC',
+            'event_submission_url_c' => 'submissionUrlC',
+            'event_faq_url_c' => 'eventFaqUrlC',
+            'event_venue_url_c' => 'eventVenueUrlC',
+            'event_visa_url_c' => 'visaUrlC',
+            'event_registration_url_c' => 'registrationUrlC',
+            'event_facebook_url_c' => 'eventFacebookUrlC',
+            'event_feedback_url_c' => 'eventFeedbackUrlC',
+            'event_testimonials_url_c' => 'eventTestimonialsUrlC',
+            'event_website_url_c' => 'eventWebsiteUrlC',
+            'event_easy_payment_url_c' => 'easyPaymentUrlC',
+            'event_decline_redirect' => 'declineRedirect',
+            'event_accept_redirect' => 'acceptRedirect',
+            'event_manager_email_c' => 'eventManagerEmailC',
+            'event_manager_name_c' => 'eventManagerNameC',
+            'event_organizer_c' => 'eventOrganizerC',
+            'event_isbn_number_c' => 'isbnNumberC',
+            'event_wire_transfer_data_c' => 'eventWireTransferDataC',
+            'event_duration_minutes' => 'durationMinutes',
+            'event_duration_hours' => 'durationHours',
+            'event_abstract_book_image_c' => 'abstractBookImageC',
+            'event_date_modified' => 'dateModified',
+            'event_date_entered' => 'dateEntered',
+            'event_early_bird_reg_deadline_c' => 'earlyBirdRegDeadlineC',
+            'event_start_date_c' => 'eventStartDateC',
+            'event_submission_deadline_c' => 'submissionDeadlineC',
+            'event_end_date_c' => 'eventEndDateC',
+            'event_early_reg_deadline_c' => 'earlyRegDeadlineC',
+            'event_final_reg_deadline_c' => 'finalRegDeadlineC',
+            'event_created_at' => 'createdAt',
+            'event_updated_at' => 'updatedAt',
+            'event_city_c' => 'eventCityC',
+            'event_country_c' => 'eventCountryC',
+            'event_field_c' => 'eventFieldC',
+            'event_currency_id' => 'currencyId',
+            'event_budget' => 'budget',
+            'event_deleted' => 'deleted',
+            'event_round_c' => 'eventRoundC',
+            'event_activity_status_type' => 'activityStatusType',
+            'event_invite_templates' => 'inviteTemplates',
+        ];
+
+        return $segmentToEntityMap[$field] ?? $field;
+    }
+
     private function contactHasEventByGenericField(int $contactId, string $field, string $operator, mixed $value): bool
     {
-        // Check via opportunities only. This ensures the event is linked to one of the contact's opportunities.
-        return $this->contactHasEventViaOpportunity($contactId, $field, $operator, $value);
+        // Check both direct event-contact relationship and via opportunities
+        return $this->contactHasEventViaDirect($contactId, $field, $operator, $value) ||
+               $this->contactHasEventViaOpportunity($contactId, $field, $operator, $value);
+    }
+
+    private function contactHasEventViaDirect(int $contactId, string $field, string $operator, mixed $value): bool
+    {
+        $qb = $this->createQueryBuilder('ec')
+            ->select('COUNT(ec.id)')
+            ->innerJoin('ec.event', 'e')
+            ->andWhere('IDENTITY(ec.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER);
+
+        $column = 'e.' . $field;
+        $this->applyOperatorToQuery($qb, $column, $operator, $value);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
     private function contactHasEventViaOpportunity(int $contactId, string $field, string $operator, mixed $value): bool
@@ -294,10 +367,12 @@ class EventContactRepository extends CommonRepository
         $trimmedValue = is_string($value) ? trim($value) : $value;
 
         switch ($operator) {
+            case '=':
             case 'eq':
                 $qb->andWhere($column.' = :'.$parameter)
                     ->setParameter($parameter, $trimmedValue);
                 break;
+            case '!=':
             case 'neq':
                 $qb->andWhere('('.$column.' != :'.$parameter.' OR '.$column.' IS NULL)')
                     ->setParameter($parameter, $trimmedValue);
@@ -392,7 +467,35 @@ class EventContactRepository extends CommonRepository
             return false;
         }
 
-        // Query via opportunities to ensure proper relationship
+        // Check both direct event-contact relationship and via opportunities
+        return $this->contactHasEventByDateComparisonDirect($contactId, $normalizedFirstDate, $operator, $normalizedSecondDate) ||
+               $this->contactHasEventByDateComparisonViaOpportunity($contactId, $normalizedFirstDate, $operator, $normalizedSecondDate);
+    }
+
+    private function contactHasEventByDateComparisonDirect(int $contactId, string $normalizedFirstDate, string $operator, string $normalizedSecondDate): bool
+    {
+        $qb = $this->createQueryBuilder('ec')
+            ->select('COUNT(ec.id)')
+            ->innerJoin('ec.event', 'e')
+            ->andWhere('IDENTITY(ec.contact) = :contactId')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER);
+
+        // Build the comparison condition
+        $firstColumn = 'e.' . $normalizedFirstDate;
+        $secondColumn = 'e.' . $normalizedSecondDate;
+
+        // Add null checks to ensure both dates exist
+        $qb->andWhere($firstColumn . ' IS NOT NULL')
+            ->andWhere($secondColumn . ' IS NOT NULL');
+
+        // Apply the operator
+        $this->applyDateComparisonOperator($qb, $firstColumn, $secondColumn, $operator);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    private function contactHasEventByDateComparisonViaOpportunity(int $contactId, string $normalizedFirstDate, string $operator, string $normalizedSecondDate): bool
+    {
         $qb = $this->_em->createQueryBuilder()
             ->select('COUNT(o.id)')
             ->from(Opportunity::class, 'o')
@@ -411,6 +514,13 @@ class EventContactRepository extends CommonRepository
             ->andWhere($secondColumn . ' IS NOT NULL');
 
         // Apply the operator
+        $this->applyDateComparisonOperator($qb, $firstColumn, $secondColumn, $operator);
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    private function applyDateComparisonOperator(QueryBuilder $qb, string $firstColumn, string $secondColumn, string $operator): void
+    {
         switch ($operator) {
             case 'lt':
                 $qb->andWhere($firstColumn . ' < ' . $secondColumn);
@@ -424,16 +534,14 @@ class EventContactRepository extends CommonRepository
             case 'gte':
                 $qb->andWhere($firstColumn . ' >= ' . $secondColumn);
                 break;
+            case '=':
             case 'eq':
                 $qb->andWhere($firstColumn . ' = ' . $secondColumn);
                 break;
+            case '!=':
             case 'neq':
                 $qb->andWhere($firstColumn . ' != ' . $secondColumn);
                 break;
-            default:
-                return false;
         }
-
-        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 }

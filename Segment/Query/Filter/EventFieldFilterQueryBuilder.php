@@ -95,29 +95,69 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         // Map segment filter field names to actual database column names
         // Some DB columns have 'event_' prefix, others don't - this maps filter names to actual column names
         $fieldMap = [
+            // Basic Event Information
             'event_name' => 'name',
-            'event_city' => 'city',
-            'event_country' => 'country',
-            'event_currency' => 'currency',
-            'event_website' => 'website',
+            'event_description' => 'description',
+            'event_about_event_c' => 'about_event_c',
             'event_external_id' => 'event_external_id',
-            'event_suitecrm_id' => 'suitecrm_id',
-            'event_registration_url' => 'registration_url',
 
-            // URL fields that have event_ prefix in filter but not in database
+            // Event URLs - Program and Details
+            'event_program_url_c' => 'event_program_url_c',
             'event_history_url_c' => 'history_url_c',
+            'event_speakers_url_c' => 'event_speakers_url_c',
             'event_submission_url_c' => 'submission_url_c',
+            'event_faq_url_c' => 'event_faq_url_c',
+            'event_venue_url_c' => 'event_venue_url_c',
             'event_visa_url_c' => 'visa_url_c',
             'event_registration_url_c' => 'registration_url_c',
-            'event_website_url_c' => 'website_url_c',  // Handle legacy filter name
-
-            // Location fields
-            'event_city_c' => 'city_c',
-            'event_country_c' => 'country_c',
+            'event_facebook_url_c' => 'event_facebook_url_c',
+            'event_feedback_url_c' => 'event_feedback_url_c',
+            'event_testimonials_url_c' => 'event_testimonials_url_c',
+            'event_website_url_c' => 'event_website_url_c',
+            'event_easy_payment_url_c' => 'easy_payment_url_c',
 
             // Redirect fields
             'event_decline_redirect' => 'decline_redirect',
             'event_accept_redirect' => 'accept_redirect',
+
+            // Event Contact Information
+            'event_manager_email_c' => 'event_manager_email_c',
+            'event_manager_name_c' => 'event_manager_name_c',
+            'event_organizer_c' => 'event_organizer_c',
+
+            // Event Details
+            'event_isbn_number_c' => 'isbn_number_c',
+            'event_wire_transfer_data_c' => 'event_wire_transfer_data_c',
+            'event_duration_minutes' => 'duration_minutes',
+            'event_duration_hours' => 'duration_hours',
+            'event_abstract_book_image_c' => 'abstract_book_image_c',
+
+            // Event Dates
+            'event_date_modified' => 'date_modified',
+            'event_date_entered' => 'date_entered',
+            'event_early_bird_reg_deadline_c' => 'early_bird_reg_deadline_c',
+            'event_start_date_c' => 'event_start_date_c',
+            'event_submission_deadline_c' => 'submission_deadline_c',
+            'event_end_date_c' => 'event_end_date_c',
+            'event_early_reg_deadline_c' => 'early_reg_deadline_c',
+            'event_final_reg_deadline_c' => 'final_reg_deadline_c',
+            'event_created_at' => 'created_at',
+            'event_updated_at' => 'updated_at',
+
+            // Event Location
+            'event_city_c' => 'event_city_c',
+            'event_country_c' => 'event_country_c',
+            'event_field_c' => 'event_field_c',
+
+            // Event Financial
+            'event_currency_id' => 'currency_id',
+            'event_budget' => 'budget',
+
+            // Event Status
+            'event_deleted' => 'deleted',
+            'event_round_c' => 'event_round_c',
+            'event_activity_status_type' => 'activity_status_type',
+            'event_invite_templates' => 'invite_templates',
         ];
 
         return $fieldMap[$field] ?? $field;

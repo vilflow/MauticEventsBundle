@@ -63,7 +63,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         // Event Field Value Condition
         if ($event->checkContext('events.field_value')) {
             $field = $config['field'] ?? '';
-            $operator = $config['operator'] ?? 'eq';
+            $operator = $config['operator'] ?? '=';
             $value = $config['value'] ?? '';
 
             if (empty($field)) {
