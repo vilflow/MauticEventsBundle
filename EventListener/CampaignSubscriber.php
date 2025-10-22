@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use MauticPlugin\MauticEventsBundle\Entity\EventContactRepository;
 use MauticPlugin\MauticEventsBundle\MauticEventsEvents;
 use MauticPlugin\MauticEventsBundle\Form\Type\CampaignEventEventFieldValueType;
+use MauticPlugin\MauticEventsBundle\Form\Type\EventDateComparisonConditionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -22,6 +23,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
             MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
+            MauticEventsEvents::ON_CAMPAIGN_TRIGGER_DATE_COMPARISON => ['onCampaignTriggerDateComparison', 0],
         ];
     }
 
@@ -36,6 +38,16 @@ class CampaignSubscriber implements EventSubscriberInterface
             'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('events.field_value', $condition);
+
+        // Event Date Comparison Condition
+        $dateComparisonCondition = [
+            'label'       => 'Event Date Comparison',
+            'description' => 'Compare two date fields from the event',
+            'formType'    => EventDateComparisonConditionType::class,
+            'formTheme'   => '@MauticEvents/FormTheme/DateComparisonCondition/_event_date_comparison_widget.html.twig',
+            'eventName'   => MauticEventsEvents::ON_CAMPAIGN_TRIGGER_DATE_COMPARISON,
+        ];
+        $event->addCondition('events.date_comparison', $dateComparisonCondition);
     }
 
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
@@ -68,6 +80,42 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $hasEvent = $this->eventContactRepository->contactHasEventByField($lead->getId(), $field, $operator, $value);
             $event->setResult($hasEvent);
+            return;
+        }
+
+        // No matching condition found
+        $event->setResult(false);
+    }
+
+    public function onCampaignTriggerDateComparison(CampaignExecutionEvent $event): void
+    {
+        $lead = $event->getLead();
+        if (!$lead || !$lead->getId()) {
+            $event->setResult(false);
+            return;
+        }
+
+        $config = $event->getConfig();
+
+        // Event Date Comparison Condition
+        if ($event->checkContext('events.date_comparison')) {
+            $firstDate = $config['firstDate'] ?? '';
+            $operator = $config['operator'] ?? 'eq';
+            $secondDate = $config['secondDate'] ?? '';
+
+            if (empty($firstDate) || empty($secondDate)) {
+                $event->setResult(false);
+                return;
+            }
+
+            $result = $this->eventContactRepository->contactHasEventByDateComparison(
+                $lead->getId(),
+                $firstDate,
+                $operator,
+                $secondDate
+            );
+
+            $event->setResult($result);
             return;
         }
 

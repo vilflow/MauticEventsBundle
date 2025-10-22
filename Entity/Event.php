@@ -11,6 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MauticPlugin\MauticEventsBundle\Entity\EventContact;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -325,6 +327,9 @@ class Event extends CommonEntity
     {
         $metadata->addPropertyConstraint('eventExternalId', new NotBlank(['message' => 'mautic.events.event_external_id.required']));
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.events.name.required']));
+
+        // Add callback for date validation
+        $metadata->addConstraint(new Callback('validateDates'));
     }
 
     /**
@@ -977,6 +982,71 @@ class Event extends CommonEntity
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    /**
+     * Validate date relationships
+     */
+    public function validateDates(ExecutionContextInterface $context): void
+    {
+        // Check if event start date is before event end date
+        if ($this->eventStartDateC && $this->eventEndDateC) {
+            if ($this->eventStartDateC > $this->eventEndDateC) {
+                $context->buildViolation('Event start date must be before or equal to event end date')
+                    ->atPath('eventStartDateC')
+                    ->addViolation();
+            }
+        }
+
+        // Check if event start date is not before created date
+        if ($this->eventStartDateC && $this->createdAt) {
+            $createdDate = clone $this->createdAt;
+            $createdDate->setTime(0, 0, 0);
+            $startDate = clone $this->eventStartDateC;
+            $startDate->setTime(0, 0, 0);
+
+            if ($startDate < $createdDate) {
+                $context->buildViolation('Event start date cannot be before the event creation date')
+                    ->atPath('eventStartDateC')
+                    ->addViolation();
+            }
+        }
+
+        // Check if submission deadline is before event start date
+        if ($this->submissionDeadlineC && $this->eventStartDateC) {
+            if ($this->submissionDeadlineC > $this->eventStartDateC) {
+                $context->buildViolation('Submission deadline must be before or equal to event start date')
+                    ->atPath('submissionDeadlineC')
+                    ->addViolation();
+            }
+        }
+
+        // Check if early registration deadlines are before final registration deadline
+        if ($this->earlyRegDeadlineC && $this->finalRegDeadlineC) {
+            if ($this->earlyRegDeadlineC > $this->finalRegDeadlineC) {
+                $context->buildViolation('Early registration deadline must be before or equal to final registration deadline')
+                    ->atPath('earlyRegDeadlineC')
+                    ->addViolation();
+            }
+        }
+
+        // Check if early bird registration deadline is before early registration deadline
+        if ($this->earlyBirdRegDeadlineC && $this->earlyRegDeadlineC) {
+            if ($this->earlyBirdRegDeadlineC > $this->earlyRegDeadlineC) {
+                $context->buildViolation('Early bird registration deadline must be before or equal to early registration deadline')
+                    ->atPath('earlyBirdRegDeadlineC')
+                    ->addViolation();
+            }
+        }
+
+        // Check if final registration deadline is before event start date
+        if ($this->finalRegDeadlineC && $this->eventStartDateC) {
+            if ($this->finalRegDeadlineC > $this->eventStartDateC) {
+                $context->buildViolation('Final registration deadline must be before or equal to event start date')
+                    ->atPath('finalRegDeadlineC')
+                    ->addViolation();
+            }
+        }
     }
 
     public function __call($name, $arguments)

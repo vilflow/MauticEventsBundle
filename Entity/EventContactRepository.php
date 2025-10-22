@@ -381,4 +381,59 @@ class EventContactRepository extends CommonRepository
                     ->setParameter($parameter, $trimmedValue);
         }
     }
+
+    public function contactHasEventByDateComparison(int $contactId, string $firstDateField, string $operator, string $secondDateField): bool
+    {
+        // Normalize field names
+        $normalizedFirstDate = $this->normalizeFieldName($firstDateField);
+        $normalizedSecondDate = $this->normalizeFieldName($secondDateField);
+
+        if (null === $normalizedFirstDate || null === $normalizedSecondDate) {
+            return false;
+        }
+
+        // Query via opportunities to ensure proper relationship
+        $qb = $this->_em->createQueryBuilder()
+            ->select('COUNT(o.id)')
+            ->from(Opportunity::class, 'o')
+            ->innerJoin('o.event', 'e')
+            ->andWhere('o.contact = :contactId')
+            ->andWhere('o.event IS NOT NULL')
+            ->andWhere('o.deleted = 0')
+            ->setParameter('contactId', $contactId, ParameterType::INTEGER);
+
+        // Build the comparison condition
+        $firstColumn = 'e.' . $normalizedFirstDate;
+        $secondColumn = 'e.' . $normalizedSecondDate;
+
+        // Add null checks to ensure both dates exist
+        $qb->andWhere($firstColumn . ' IS NOT NULL')
+            ->andWhere($secondColumn . ' IS NOT NULL');
+
+        // Apply the operator
+        switch ($operator) {
+            case 'lt':
+                $qb->andWhere($firstColumn . ' < ' . $secondColumn);
+                break;
+            case 'lte':
+                $qb->andWhere($firstColumn . ' <= ' . $secondColumn);
+                break;
+            case 'gt':
+                $qb->andWhere($firstColumn . ' > ' . $secondColumn);
+                break;
+            case 'gte':
+                $qb->andWhere($firstColumn . ' >= ' . $secondColumn);
+                break;
+            case 'eq':
+                $qb->andWhere($firstColumn . ' = ' . $secondColumn);
+                break;
+            case 'neq':
+                $qb->andWhere($firstColumn . ' != ' . $secondColumn);
+                break;
+            default:
+                return false;
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
 }
