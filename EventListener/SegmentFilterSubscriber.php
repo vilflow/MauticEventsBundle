@@ -170,14 +170,28 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             ],
             'event_manager_name_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_manager_name_c'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Romina Dellucci' => 'Romina_Dellucci',
+                        'Laura Johnson' => 'Laura_Johnson',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
             'event_organizer_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_organizer_c'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Acavent' => 'Acavent',
+                        'GlobalKS' => 'GlobalKS',
+                        'STE' => 'STE',
+                        'ProudPen' => 'ProudPen',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
 
@@ -278,20 +292,47 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             // Event Location
             'event_city_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_city_c'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Geneva' => 'Geneva',
+                        'Prague' => 'Prague',
+                        'Copenhagen' => 'Copenhagen',
+                        'Berlin' => 'Berlin',
+                        'Vienna' => 'Vienna',
+                        'Lisbon' => 'Lisbon',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
             'event_country_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_country_c'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Switzerland' => 'Switzerland',
+                        'Czech Republic' => 'Czech_Republic',
+                        'Denmark' => 'Denmark',
+                        'Germany' => 'Germany',
+                        'Austria' => 'Austria',
+                        'Portugal' => 'Portugal',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
             'event_field_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_field_c'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Education' => 'Education',
+                        'Social Sciences' => 'Social_Sciences',
+                        'Management' => 'Management',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
 
@@ -318,20 +359,42 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             ],
             'event_round_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_round_c'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        '1st' => '1st',
+                        '2nd' => '2nd',
+                        '3rd' => '3rd',
+                        '4th' => '4th',
+                        '5th' => '5th',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
             'event_activity_status_type' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_activity_status_type'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Active' => 'active',
+                        'Inactive' => 'inactive',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
             'event_invite_templates' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_invite_templates'),
-                'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Campaign' => 'campaign',
+                        'Email' => 'email',
+                        'Event' => 'event',
+                    ],
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
                 'object'     => 'lead',
             ],
         ];
