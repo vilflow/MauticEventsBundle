@@ -591,12 +591,12 @@ class Event extends CommonEntity
         return $this;
     }
 
-    public function getWebsiteUrlC(): ?string
+    public function getEventWebsiteUrlC(): ?string
     {
         return $this->eventWebsiteUrlC;
     }
 
-    public function setWebsiteUrlC(?string $eventWebsiteUrlC): self
+    public function setEventWebsiteUrlC(?string $eventWebsiteUrlC): self
     {
         $this->eventWebsiteUrlC = $eventWebsiteUrlC;
         $this->updatedAt = new \DateTime();
