@@ -104,6 +104,11 @@ class CampaignEventEventFieldValueType extends AbstractType
             // For fields that allow freeform input, only show dropdown if there's a current value that matches predefined options
             if ((!empty($fieldValues) || 'select' === $fieldType) && $supportsChoices) {
                 $valueMatchesPredefinedOptions = static function ($value) use ($fieldValues): bool {
+                    // If no fieldValues, can't match predefined options
+                    if (empty($fieldValues)) {
+                        return false;
+                    }
+
                     if (is_array($value)) {
                         foreach ($value as $item) {
                             if (!isset($fieldValues[$item ?? ''])) {
@@ -146,12 +151,12 @@ class CampaignEventEventFieldValueType extends AbstractType
                             'data-onload-callback' => 'updateEventFieldValueOptions',
                         ],
                         'choice_attr' => $choiceAttr,
-                        'required'    => true,
-                        'constraints' => [
+                        'required'    => $supportsValue,
+                        'constraints' => $supportsValue ? [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
                             ),
-                        ],
+                        ] : [],
                         'multiple' => $multiple,
                         'data'     => $value,
                     ]

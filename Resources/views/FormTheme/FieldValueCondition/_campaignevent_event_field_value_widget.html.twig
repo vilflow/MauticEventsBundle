@@ -41,6 +41,137 @@
 
 <script>
     if (typeof Mautic.updateEventFieldValues === 'undefined') {
+        // Store original updateFieldOperatorValue function
+        var originalUpdateFieldOperatorValue = Mautic.updateFieldOperatorValue;
+
+        // Override Mautic.updateFieldOperatorValue to handle event fields with proper action
+        Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOnChangeArguments) {
+            var fieldId = mQuery(field).attr('id');
+            var isOperatorField = fieldId.indexOf('_operator') !== -1;
+            var fieldType = isOperatorField ? 'operator' : 'field';
+            var fieldPrefix = fieldId.slice(0, -1 * fieldType.length);
+            var currentFieldType = mQuery('#' + fieldPrefix + 'value').attr('data-toggle');
+
+            // Check if this is an event field (action contains 'plugin:events')
+            var isEventField = action && action.indexOf('plugin:events') !== -1;
+
+            // For event fields, use custom handling to preserve the Events bundle action
+            if (isEventField) {
+                Mautic.activateLabelLoadingIndicator(fieldId);
+                var fieldAlias = mQuery('#'+fieldPrefix+'field').val();
+                var fieldOperator = mQuery('#'+fieldPrefix+'operator').val();
+
+                Mautic.ajaxActionRequest(action, {'alias': fieldAlias, 'operator': fieldOperator, 'changed': fieldType}, function(response) {
+                    if (typeof response.options != 'undefined') {
+                        var valueField = mQuery('#'+fieldPrefix+'value');
+                        var valueFieldAttrs = {
+                            'class': valueField.attr('class'),
+                            'id': valueField.attr('id'),
+                            'name': valueField.attr('name'),
+                            'autocomplete': valueField.attr('autocomplete'),
+                            'value': valueField.val(),
+                            'data-toggle': currentFieldType,
+                            'data-onload-callback': valueField.attr('data-onload-callback')
+                        };
+
+                        if (mQuery('#'+fieldPrefix+'value_chosen').length) {
+                            valueFieldAttrs['value'] = '';
+                            Mautic.destroyChosen(valueField);
+                        }
+
+                        if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
+                            var newValueField = mQuery('<select/>')
+                                .attr('class', valueFieldAttrs['class'])
+                                .attr('id', valueFieldAttrs['id'])
+                                .attr('name', valueFieldAttrs['name'])
+                                .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                                .attr('data-toggle', valueFieldAttrs['data-toggle'])
+                                .attr('data-onload-callback', valueFieldAttrs['data-onload-callback']);
+
+                            var multiple = (fieldOperator === 'in' || fieldOperator === '!in');
+                            if (multiple) {
+                                newValueField.attr('multiple', 'multiple');
+                                var newName = newValueField.attr('name') + '[]';
+                                newValueField.attr('name', newName);
+                                newValueField.attr('data-placeholder', mauticLang['chosenChooseMore']);
+                            }
+
+                            mQuery.each(response.options, function(value, optgroup) {
+                                if (typeof optgroup === 'object') {
+                                    var optgroupEl = mQuery('<optgroup/>').attr('label', value);
+                                    mQuery.each(optgroup, function(optVal, label) {
+                                        var option = Mautic.createOption(optVal, label);
+                                        if (response.optionsAttr && response.optionsAttr[optVal]) {
+                                            mQuery.each(response.optionsAttr[optVal], function(optAttr, optVal) {
+                                                option.attr(optAttr, optVal);
+                                            });
+                                        }
+                                        optgroupEl.append(option)
+                                    });
+                                    newValueField.append(optgroupEl);
+                                } else {
+                                    var option = Mautic.createOption(value, optgroup);
+                                    if (response.optionsAttr && response.optionsAttr[value]) {
+                                        mQuery.each(response.optionsAttr[value], function(optAttr, optVal) {
+                                            option.attr(optAttr, optVal);
+                                        });
+                                    }
+                                    newValueField.append(option);
+                                }
+                            });
+                            newValueField.val(valueFieldAttrs['value']);
+                            valueField.replaceWith(newValueField);
+                            Mautic.activateChosenSelect(newValueField);
+                        } else if (mQuery.isEmptyObject(response.options) || response.fieldType === 'number') {
+                            // For date fields or number fields with no options, create a text/number input
+                            var inputType = response.fieldType === 'number' ? 'number' : 'text';
+                            var newValueField = mQuery('<input/>')
+                                .attr('class', valueFieldAttrs['class'])
+                                .attr('id', valueFieldAttrs['id'])
+                                .attr('name', valueFieldAttrs['name'])
+                                .attr('autocomplete', valueFieldAttrs['autocomplete'])
+                                .attr('type', inputType)
+                                .attr('data-toggle', valueFieldAttrs['data-toggle'])
+                                .attr('data-onload-callback', valueFieldAttrs['data-onload-callback'])
+                                .val(valueFieldAttrs['value']);
+
+                            valueField.replaceWith(newValueField);
+                        }
+
+                        if (response.operators) {
+                            var operatorField = mQuery('#'+fieldPrefix+'operator');
+                            var currentOperator = operatorField.val();
+                            operatorField.html('');
+                            mQuery.each(response.operators, function(value, label) {
+                                operatorField.append(mQuery('<option/>').attr('value', value).text(label));
+                            });
+                            operatorField.val(currentOperator);
+                        }
+
+                        if (response.disabled) {
+                            mQuery('#'+fieldPrefix+'value').attr('disabled', 'disabled');
+                        } else {
+                            mQuery('#'+fieldPrefix+'value').removeAttr('disabled');
+                        }
+                    }
+
+                    if (valueOnChange && typeof valueOnChange == 'function') {
+                        mQuery('#'+fieldPrefix+'value').off('change').on('change', function () {
+                            if (typeof valueOnChangeArguments != 'object') {
+                                valueOnChangeArguments = [];
+                            }
+                            valueOnChangeArguments.unshift(mQuery('#'+fieldPrefix+'value'));
+                            valueOnChange.apply(null, valueOnChangeArguments);
+                        });
+                    }
+                    Mautic.removeLabelLoadingIndicator();
+                }, false, false, "POST");
+            } else {
+                // Use original function for non-event fields
+                originalUpdateFieldOperatorValue.apply(this, arguments);
+            }
+        };
+
         Mautic.updateEventFieldValues = function (field) {
             mQuery('.condition-custom-date-row').hide();
             Mautic.updateFieldOperatorValue(field, 'plugin:events:updateEventFieldValues', Mautic.updateEventFieldValueOptions, [true]);
@@ -55,42 +186,57 @@
         Mautic.updateEventFieldValueOptions = function (field, updating) {
             var fieldId = mQuery(field).attr('id');
             var fieldPrefix = fieldId.slice(0, -5);
+            var operator = mQuery('#' + fieldPrefix + 'operator').val();
+            var fieldType = mQuery('#' + fieldPrefix + 'value').attr('data-toggle');
 
-            if ('date' === mQuery('#' + fieldPrefix + 'operator').val()) {
+            // Check if operator is a date comparison operator
+            var dateOperators = ['date', '=', '!=', '>', '<', '>=', '<='];
+            var isDateOperator = dateOperators.indexOf(operator) !== -1;
+
+            // For date fields with date operators, handle custom date option
+            if (isDateOperator && 'date' === fieldType) {
                 var customOption = mQuery(field).find('option[data-custom=1]');
-                var value = mQuery(field).val();
-                var customSelected = mQuery(customOption).prop('selected');
 
-                if (customSelected) {
-                    if (!updating) {
-                        var regex = /(\+|-)(PT?)([0-9]*)([DMHY])$/g;
-                        var match = regex.exec(value);
-                        if (match) {
-                            var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
-                            var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+                // Only process if this is actually a select element with custom option
+                if (customOption.length > 0) {
+                    var value = mQuery(field).val();
+                    var customSelected = mQuery(customOption).prop('selected');
 
-                            mQuery('#event-field-custom-date-interval').val(interval);
-                            mQuery('#event-field-custom-date-unit').val(unit.toLowerCase());
+                    if (customSelected) {
+                        if (!updating) {
+                            var regex = /(\+|-)(PT?)([0-9]*)([DMHY])$/g;
+                            var match = regex.exec(value);
+                            if (match) {
+                                var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
+                                var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+
+                                mQuery('#event-field-custom-date-interval').val(interval);
+                                mQuery('#event-field-custom-date-unit').val(unit.toLowerCase());
+                            }
+                        } else {
+                            var interval = mQuery('#event-field-custom-date-interval').val();
+                            var unit = mQuery('#event-field-custom-date-unit').val();
+
+                            var prefix = ('i' === unit || 'h' === unit) ? 'PT' : 'P';
+                            if ('i' === unit) {
+                                unit = 'm';
+                            }
+
+                            unit = unit.toUpperCase();
+
+                            var operator = parseInt(interval, 10) < 0 ? '-' : '+';
+                            interval = Math.abs(parseInt(interval, 10));
+                            var newValue = operator + prefix + interval + unit;
+                            customOption.attr('value', newValue);
                         }
+                        mQuery('.condition-custom-date-row').show();
                     } else {
-                        var interval = mQuery('#event-field-custom-date-interval').val();
-                        var unit = mQuery('#event-field-custom-date-unit').val();
-
-                        var prefix = ('i' === unit || 'h' === unit) ? 'PT' : 'P';
-                        if ('i' === unit) {
-                            unit = 'm';
-                        }
-
-                        unit = unit.toUpperCase();
-
-                        var operator = parseInt(interval, 10) < 0 ? '-' : '+';
-                        interval = Math.abs(parseInt(interval, 10));
-                        var newValue = operator + prefix + interval + unit;
-                        customOption.attr('value', newValue);
+                        mQuery('.condition-custom-date-row').hide();
                     }
-                    mQuery('.condition-custom-date-row').show();
                 } else {
-                    mQuery('.condition-custom-date-row').hide();
+                    // If no custom option found, just show the custom date row
+                    // (it will be populated when AJAX completes)
+                    mQuery('.condition-custom-date-row').show();
                 }
             } else {
                 mQuery('.condition-custom-date-row').hide();

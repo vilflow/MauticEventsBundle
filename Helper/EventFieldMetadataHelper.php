@@ -166,13 +166,23 @@ class EventFieldMetadataHelper
                 ];
                 break;
             default:
-                if (in_array($field, self::DATE_FIELDS, true) && 'date' === $operator) {
-                    $fieldHelper = new FormFieldHelper();
-                    $fieldHelper->setTranslator($this->translator);
-                    $dateChoices = $fieldHelper->getDateChoices();
-                    $customChoiceValue = (empty($currentValue) || isset($dateChoices[$currentValue])) ? 'custom' : (string) $currentValue;
-                    $options = [$customChoiceValue => $this->translator->trans('mautic.campaign.event.timed.choice.custom')] + $dateChoices;
-                    $optionsAttr[$customChoiceValue] = ['data-custom' => 1];
+                // Load date options for date fields
+                if (in_array($field, self::DATE_FIELDS, true)) {
+                    // Always provide date options for date fields with comparison operators
+                    // to ensure selectbox is displayed instead of text input
+                    $dateIntervalOperators = ['date', '=', '!=', '<>', '>', '<', '>=', '<=', 'gt', 'lt', 'gte', 'lte'];
+
+                    if (in_array($operator, $dateIntervalOperators, true)) {
+                        // For date comparison operators, provide full date choices
+                        $fieldHelper = new FormFieldHelper();
+                        $fieldHelper->setTranslator($this->translator);
+                        $dateChoices = $fieldHelper->getDateChoices();
+                        $customChoiceValue = (empty($currentValue) || isset($dateChoices[$currentValue])) ? 'custom' : (string) $currentValue;
+                        $options = [$customChoiceValue => $this->translator->trans('mautic.campaign.event.timed.choice.custom')] + $dateChoices;
+                        $optionsAttr[$customChoiceValue] = ['data-custom' => 1];
+                    }
+                    // For other operators on date fields, return empty to use text input
+                    // This is appropriate for operators like 'like', 'between', 'empty', 'regexp', etc.
                 }
                 break;
         }
