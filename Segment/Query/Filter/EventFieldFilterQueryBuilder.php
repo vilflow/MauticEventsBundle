@@ -40,6 +40,10 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         // Map filter field names to actual column names
         $fieldColumn = $this->mapFilterFieldToColumn($filter->getField());
 
+        // Check if this is a date field - if so, use DATE() function to compare only date part without time
+        $isDateField = $this->isDateField($fieldColumn);
+        $fieldExpression = $isDateField ? 'DATE('.$tableAlias.'_e.'.$fieldColumn.')' : $tableAlias.'_e.'.$fieldColumn;
+
         switch ($filterOperator) {
             case 'empty':
                 $subQueryBuilder->andWhere($subQueryBuilder->expr()->or(
@@ -56,7 +60,11 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'neq':
-                $subQueryBuilder->andWhere($subQueryBuilder->expr()->neq($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
+                if ($isDateField) {
+                    $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') != '.$filterParametersHolder);
+                } else {
+                    $subQueryBuilder->andWhere($subQueryBuilder->expr()->neq($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
+                }
                 $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notIn':
@@ -78,7 +86,12 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'lt':
             case 'lte':
             case 'regexp':
-                $subQueryBuilder->andWhere($subQueryBuilder->expr()->$filterOperator($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
+                if ($isDateField && in_array($filterOperator, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
+                    // For date fields, use DATE() function to compare only the date part
+                    $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') '.$this->getOperatorSymbol($filterOperator).' '.$filterParametersHolder);
+                } else {
+                    $subQueryBuilder->andWhere($subQueryBuilder->expr()->$filterOperator($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
+                }
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
@@ -161,5 +174,43 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         ];
 
         return $fieldMap[$field] ?? $field;
+    }
+
+    /**
+     * Check if a field is a date/datetime field that should be compared without time
+     */
+    private function isDateField(string $fieldColumn): bool
+    {
+        $dateFields = [
+            'date_modified',
+            'date_entered',
+            'early_bird_reg_deadline_c',
+            'event_start_date_c',
+            'submission_deadline_c',
+            'event_end_date_c',
+            'early_reg_deadline_c',
+            'final_reg_deadline_c',
+            'created_at',
+            'updated_at',
+        ];
+
+        return in_array($fieldColumn, $dateFields);
+    }
+
+    /**
+     * Convert filter operator to SQL operator symbol
+     */
+    private function getOperatorSymbol(string $operator): string
+    {
+        $operatorMap = [
+            'eq' => '=',
+            'neq' => '!=',
+            'gt' => '>',
+            'gte' => '>=',
+            'lt' => '<',
+            'lte' => '<=',
+        ];
+
+        return $operatorMap[$operator] ?? '=';
     }
 }
