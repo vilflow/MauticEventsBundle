@@ -168,6 +168,12 @@ class CampaignEventEventFieldValueType extends AbstractType
                     'data-onload-callback' => 'updateEventFieldValueOptions',
                 ];
 
+                // Add datepicker for date/datetime fields
+                if ('date' === $fieldType) {
+                    $attr['class'] .= ' eventdatepicker';
+                    $attr['placeholder'] = 'yyyy-mm-dd';
+                }
+
                 // Add datalist support for freeform fields with predefined options
                 if ($allowsFreeform && !empty($fieldValues)) {
                     $attr['list'] = 'event_field_options_' . ($data['field'] ?? '');

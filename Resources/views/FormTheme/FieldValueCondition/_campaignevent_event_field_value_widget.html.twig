@@ -11,6 +11,40 @@
     </div>
 </div>
 
+<style>
+    .eventdatepicker {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999" width="16" height="16"><path d="M7 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm7-8H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3V2h-2v4h-6V2h-2v4zm9 18H4V8h16v16zm-5-5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm5 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-10 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>') !important;
+        background-repeat: no-repeat !important;
+        background-position: right 10px center !important;
+        background-size: 16px !important;
+        padding-right: 35px !important;
+    }
+
+    /* Style HTML5 date input */
+    input[type="date"].eventdatepicker {
+        position: relative;
+    }
+
+    /* Chrome, Safari, Edge, Opera */
+    input[type="date"].eventdatepicker::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        border-radius: 4px;
+        margin-right: 2px;
+        opacity: 0.6;
+        filter: invert(0.6);
+    }
+
+    input[type="date"].eventdatepicker::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+        filter: invert(0.8);
+    }
+
+    /* Firefox */
+    input[type="date"].eventdatepicker::-moz-calendar-picker-indicator {
+        cursor: pointer;
+    }
+</style>
+
 <div class="row condition-custom-date-row" style="display: none;">
     <div class="col-sm-offset-4 col-sm-4">
         <div class="row">
@@ -122,6 +156,34 @@
                             newValueField.val(valueFieldAttrs['value']);
                             valueField.replaceWith(newValueField);
                             Mautic.activateChosenSelect(newValueField);
+
+                            // Add change event handler to show datepicker for "custom" option
+                            mQuery('#' + valueFieldAttrs['id']).off('change').on('change', function() {
+                                var selectedValue = mQuery(this).val();
+                                var hasDatepickerOption = mQuery(this).find('option[data-datepicker=1]').length > 0;
+                                if (hasDatepickerOption && mQuery(this).find('[value="' + selectedValue + '"][data-datepicker=1]').length > 0) {
+                                    // Show a temporary date input for custom date selection
+                                    var tempDatePickerId = valueFieldAttrs['id'] + '_datepicker';
+                                    var existingDatePicker = mQuery('#' + tempDatePickerId);
+
+                                    if (existingDatePicker.length === 0) {
+                                        var tempDatePicker = mQuery('<input type="text" />')
+                                            .attr('id', tempDatePickerId)
+                                            .attr('placeholder', 'yyyy-mm-dd')
+                                            .addClass('form-control eventdatepicker')
+                                            .css({'margin-top': '10px'})
+                                            .on('change', function() {
+                                                mQuery('#' + valueFieldAttrs['id']).val(mQuery(this).val()).trigger('change');
+                                                mQuery(this).remove();
+                                            });
+                                        mQuery(this).closest('.form-group').append(tempDatePicker);
+                                        setTimeout(function() {
+                                            Mautic.initEventDatePicker(mQuery('#' + tempDatePickerId));
+                                            mQuery('#' + tempDatePickerId).focus();
+                                        }, 50);
+                                    }
+                                }
+                            });
                         } else if (mQuery.isEmptyObject(response.options) || response.fieldType === 'number') {
                             // For date fields or number fields with no options, create a text/number input
                             var inputType = response.fieldType === 'number' ? 'number' : 'text';
@@ -135,7 +197,20 @@
                                 .attr('data-onload-callback', valueFieldAttrs['data-onload-callback'])
                                 .val(valueFieldAttrs['value']);
 
+                            // Add datepicker class for date fields
+                            if ('date' === response.fieldType) {
+                                newValueField.addClass('eventdatepicker');
+                                newValueField.attr('placeholder', 'yyyy-mm-dd');
+                            }
+
                             valueField.replaceWith(newValueField);
+
+                            // Initialize datepicker if it's a date field
+                            if ('date' === response.fieldType) {
+                                setTimeout(function() {
+                                    Mautic.initEventDatePicker(mQuery('#' + valueFieldAttrs['id']));
+                                }, 100);
+                            }
                         }
 
                         if (response.operators) {
@@ -195,53 +270,124 @@
 
             // For date fields with date operators, handle custom date option
             if (isDateOperator && 'date' === fieldType) {
-                var customOption = mQuery(field).find('option[data-custom=1]');
+                var valueField = mQuery(field);
+                var isSelectField = valueField.prop('tagName') === 'SELECT';
 
-                // Only process if this is actually a select element with custom option
-                if (customOption.length > 0) {
-                    var value = mQuery(field).val();
-                    var customSelected = mQuery(customOption).prop('selected');
+                if (isSelectField) {
+                    var customOption = valueField.find('option[data-custom=1]');
 
-                    if (customSelected) {
-                        if (!updating) {
-                            var regex = /(\+|-)(PT?)([0-9]*)([DMHY])$/g;
-                            var match = regex.exec(value);
-                            if (match) {
-                                var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
-                                var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+                    // Only process if this is actually a select element with custom option
+                    if (customOption.length > 0) {
+                        var value = valueField.val();
+                        var customSelected = mQuery(customOption).prop('selected');
 
-                                mQuery('#event-field-custom-date-interval').val(interval);
-                                mQuery('#event-field-custom-date-unit').val(unit.toLowerCase());
+                        if (customSelected) {
+                            if (!updating) {
+                                var regex = /(\+|-)(PT?)([0-9]*)([DMHY])$/g;
+                                var match = regex.exec(value);
+                                if (match) {
+                                    var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
+                                    var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+
+                                    mQuery('#event-field-custom-date-interval').val(interval);
+                                    mQuery('#event-field-custom-date-unit').val(unit.toLowerCase());
+                                }
+                            } else {
+                                var interval = mQuery('#event-field-custom-date-interval').val();
+                                var unit = mQuery('#event-field-custom-date-unit').val();
+
+                                var prefix = ('i' === unit || 'h' === unit) ? 'PT' : 'P';
+                                if ('i' === unit) {
+                                    unit = 'm';
+                                }
+
+                                unit = unit.toUpperCase();
+
+                                var operatorChar = parseInt(interval, 10) < 0 ? '-' : '+';
+                                interval = Math.abs(parseInt(interval, 10));
+                                var newValue = operatorChar + prefix + interval + unit;
+                                customOption.attr('value', newValue);
                             }
+                            mQuery('.condition-custom-date-row').show();
                         } else {
-                            var interval = mQuery('#event-field-custom-date-interval').val();
-                            var unit = mQuery('#event-field-custom-date-unit').val();
-
-                            var prefix = ('i' === unit || 'h' === unit) ? 'PT' : 'P';
-                            if ('i' === unit) {
-                                unit = 'm';
-                            }
-
-                            unit = unit.toUpperCase();
-
-                            var operator = parseInt(interval, 10) < 0 ? '-' : '+';
-                            interval = Math.abs(parseInt(interval, 10));
-                            var newValue = operator + prefix + interval + unit;
-                            customOption.attr('value', newValue);
+                            mQuery('.condition-custom-date-row').hide();
                         }
-                        mQuery('.condition-custom-date-row').show();
                     } else {
-                        mQuery('.condition-custom-date-row').hide();
+                        // If no custom option found, just show the custom date row
+                        // (it will be populated when AJAX completes)
+                        mQuery('.condition-custom-date-row').show();
                     }
                 } else {
-                    // If no custom option found, just show the custom date row
-                    // (it will be populated when AJAX completes)
-                    mQuery('.condition-custom-date-row').show();
+                    // For text input fields with date type, initialize datepicker
+                    Mautic.initEventDatePicker(valueField);
                 }
             } else {
                 mQuery('.condition-custom-date-row').hide();
             }
         };
+
+        // Initialize date picker for date fields
+        // Tries datetimepicker first (if available), then HTML5 type="date"
+        Mautic.initEventDatePicker = function(field) {
+            var $field = mQuery(field);
+
+            if (!$field.length) {
+                return;
+            }
+
+            // Try using datetimepicker if available (Mautic standard)
+            if (typeof $field.datetimepicker === 'function') {
+                try {
+                    $field.datetimepicker({
+                        format: 'Y-m-d',
+                        closeOnDateSelect: true,
+                        validateOnBlur: false,
+                        scrollMonth: false,
+                        scrollInput: false,
+                        timepicker: false
+                    });
+                    return;
+                } catch(e) {
+                    // If datetimepicker fails, continue to HTML5
+                }
+            }
+
+            // Fallback: Convert to HTML5 date input type
+            if ($field.attr('type') === 'text') {
+                $field.attr('type', 'date');
+                // Set value in correct format if it exists
+                var currentVal = $field.val();
+                if (currentVal && !currentVal.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    // Try to parse and reformat the value
+                    try {
+                        var date = new Date(currentVal);
+                        if (!isNaN(date.getTime())) {
+                            var year = date.getFullYear();
+                            var month = String(date.getMonth() + 1).padStart(2, '0');
+                            var day = String(date.getDate()).padStart(2, '0');
+                            $field.val(year + '-' + month + '-' + day);
+                        }
+                    } catch(e) {
+                        // Leave as is
+                    }
+                }
+            }
+        };
+
+        // Initialize all datepickers on page load
+        Mautic.initializeEventDatePickers = function() {
+            mQuery('.eventdatepicker').each(function() {
+                Mautic.initEventDatePicker(this);
+            });
+        };
+
+        // Initialize datepickers when document is ready
+        mQuery(document).ready(function() {
+            // Give a small delay to ensure all assets are loaded
+            setTimeout(function() {
+                Mautic.initializeEventDatePickers();
+            }, 500);
+        });
     }
 </script>
 {% endblock %}
