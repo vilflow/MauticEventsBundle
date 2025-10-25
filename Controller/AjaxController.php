@@ -43,9 +43,15 @@ class AjaxController extends CoreAjaxController
         }
 
         $optionsMeta = $metadataHelper->getFieldOptions($alias, $operator);
+
         if (!empty($optionsMeta['options'])) {
             $data['options'] = $optionsMeta['options'];
             $data['optionsAttr'] = $optionsMeta['optionsAttr'] ?? [];
+        }
+
+        // Also pass customChoiceValue if available (for date fields)
+        if (isset($optionsMeta['customChoiceValue'])) {
+            $data['customChoiceValue'] = $optionsMeta['customChoiceValue'];
         }
 
         if (in_array($operator, ['empty', '!empty'], true)) {

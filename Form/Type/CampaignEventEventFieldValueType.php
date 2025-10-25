@@ -131,7 +131,39 @@ class CampaignEventEventFieldValueType extends AbstractType
                 $shouldShowAsText = true;
             }
 
-            if (!$shouldShowAsText && ((!empty($fieldValues) || 'select' === $fieldType) && $supportsChoices)) {
+            // For date fields with 'date' operator, show select with predefined options
+            // For other operators, show date picker input directly
+            if ('date' === $fieldType && !empty($fieldValues) && $supportsChoices && 'date' === $operator) {
+                $multiple = in_array($operator, ['in', '!in']);
+                $rawValue = $data['value'] ?? null;
+                $value    = $multiple && !is_array($rawValue) ? (null !== $rawValue ? [$rawValue] : []) : $rawValue;
+
+                $form->add(
+                    'value',
+                    ChoiceType::class,
+                    [
+                        // Symfony expects 'label' => 'value'
+                        'choices'           => !empty($fieldValues) ? array_flip($fieldValues) : [],
+                        'label'             => 'mautic.form.field.form.value',
+                        'label_attr'        => ['class' => 'control-label'],
+                        'attr'              => [
+                            'class'                => 'form-control',
+                            'onchange'             => 'Mautic.updateEventFieldValueOptions(this)',
+                            'data-toggle'          => $fieldType,
+                            'data-onload-callback' => 'updateEventFieldValueOptions',
+                        ],
+                        'choice_attr' => $choiceAttr,
+                        'required'    => $supportsValue,
+                        'constraints' => $supportsValue ? [
+                            new NotBlank(
+                                ['message' => 'mautic.core.value.required']
+                            ),
+                        ] : [],
+                        'multiple' => $multiple,
+                        'data'     => $value,
+                    ]
+                );
+            } elseif (!$shouldShowAsText && ((!empty($fieldValues) || 'select' === $fieldType) && $supportsChoices)) {
                 $multiple = in_array($operator, ['in', '!in']);
                 $rawValue = $data['value'] ?? null;
                 $value    = $multiple && !is_array($rawValue) ? (null !== $rawValue ? [$rawValue] : []) : $rawValue;

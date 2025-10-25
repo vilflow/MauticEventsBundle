@@ -95,6 +95,36 @@ class EventFieldMetadataHelper
         $customChoiceValue = null;
         $optionsAttr = [];
 
+        // For DATE fields, only show predefined date options for 'date' operator
+        if (in_array($field, self::DATE_FIELDS, true)) {
+            // Show date options dropdown only for 'date' operator
+            if ('date' === $operator) {
+                $options = [
+                    'custom'     => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
+                    'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
+                    '+P0D'       => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
+                    '-P1D'       => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
+                    '+P1D'       => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
+                ];
+                $optionsAttr['custom'] = ['data-custom' => 1, 'data-datepicker' => 1];
+                $customChoiceValue = 'custom';
+
+                return [
+                    'options'           => $options,
+                    'customChoiceValue' => $customChoiceValue,
+                    'optionsAttr'       => $optionsAttr,
+                ];
+            }
+
+            // For all other operators (=, !=, >, <, >=, <=, empty, !empty), return no options
+            // This will make the field render as a date picker input
+            return [
+                'options'           => null,
+                'customChoiceValue' => null,
+                'optionsAttr'       => [],
+            ];
+        }
+
         switch ($field) {
             case 'eventOrganizerC':
                 $options = [
@@ -166,36 +196,7 @@ class EventFieldMetadataHelper
                 ];
                 break;
             default:
-                // Load date options for date fields
-                if (in_array($field, self::DATE_FIELDS, true)) {
-                    // Handle 'date' operator with predefined date options
-                    if ('date' === $operator) {
-                        $options = [
-                            'today'     => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
-                            'yesterday' => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
-                            'tomorrow'  => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
-                            'custom'    => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
-                        ];
-                        $optionsAttr['custom'] = ['data-custom' => 1, 'data-datepicker' => 1];
-                        break;
-                    }
-
-                    // Always provide date options for date fields with comparison operators
-                    // to ensure selectbox is displayed instead of text input
-                    $dateIntervalOperators = ['=', '!=', '<>', '>', '<', '>=', '<=', 'gt', 'lt', 'gte', 'lte'];
-
-                    if (in_array($operator, $dateIntervalOperators, true)) {
-                        // For date comparison operators, provide full date choices
-                        $fieldHelper = new FormFieldHelper();
-                        $fieldHelper->setTranslator($this->translator);
-                        $dateChoices = $fieldHelper->getDateChoices();
-                        $customChoiceValue = (empty($currentValue) || isset($dateChoices[$currentValue])) ? 'custom' : (string) $currentValue;
-                        $options = [$customChoiceValue => $this->translator->trans('mautic.campaign.event.timed.choice.custom')] + $dateChoices;
-                        $optionsAttr[$customChoiceValue] = ['data-custom' => 1, 'data-datepicker' => 1];
-                    }
-                    // For other operators on date fields, return empty to use text input
-                    // This is appropriate for operators like 'like', 'between', 'empty', 'regexp', etc.
-                }
+                // Non-date fields handled above
                 break;
         }
 
