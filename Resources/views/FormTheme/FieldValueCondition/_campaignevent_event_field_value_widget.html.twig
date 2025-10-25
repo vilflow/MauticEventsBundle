@@ -153,7 +153,20 @@
                                     newValueField.append(option);
                                 }
                             });
-                            newValueField.val(valueFieldAttrs['value']);
+
+                            // For date fields with DateInterval values (e.g., +P16D), adjust before setting value
+                            var savedValue = valueFieldAttrs['value'];
+                            if ('date' === valueFieldAttrs['data-toggle'] && savedValue && /^[+-]PT?[0-9]+[DIMHY]$/i.test(savedValue)) {
+                                console.log('Detected DateInterval value on build:', savedValue);
+                                // Find custom option and set its value to the DateInterval
+                                var customOpt = newValueField.find('option[data-custom=1]');
+                                if (customOpt.length) {
+                                    customOpt.attr('value', savedValue);
+                                    console.log('Set custom option value to:', savedValue);
+                                }
+                            }
+
+                            newValueField.val(savedValue);
                             valueField.replaceWith(newValueField);
                             Mautic.activateChosenSelect(newValueField);
 
@@ -262,6 +275,41 @@
                             valueOnChangeArguments.unshift(mQuery('#'+fieldPrefix+'value'));
                             valueOnChange.apply(null, valueOnChangeArguments);
                         });
+
+                        // After building the select, check if we need to parse DateInterval value
+                        // This handles reopening modal with saved DateInterval values like +P16D
+                        setTimeout(function() {
+                            var valueField = mQuery('#'+fieldPrefix+'value');
+                            if (valueField.length && valueField.is('select')) {
+                                var currentValue = valueField.val();
+                                console.log('Checking value field after build:', currentValue);
+
+                                // If current value is in DateInterval format (e.g., +P16D)
+                                if (currentValue && /^[+-]PT?[0-9]+[DIMHY]$/i.test(currentValue)) {
+                                    console.log('Found DateInterval value, selecting custom option');
+                                    // Find and select the custom option
+                                    var customOption = valueField.find('option[data-custom=1]');
+                                    if (customOption.length) {
+                                        // Store the DateInterval value
+                                        var dateIntervalValue = currentValue;
+                                        // Set custom option's value to the DateInterval
+                                        customOption.attr('value', dateIntervalValue);
+                                        // Select the custom option
+                                        valueField.val('custom');
+                                        customOption.prop('selected', true);
+
+                                        // Update Chosen if it's initialized
+                                        if (valueField.next('.chosen-container').length) {
+                                            valueField.trigger('chosen:updated');
+                                        }
+
+                                        // Now parse the DateInterval and populate interval/unit fields
+                                        console.log('Parsing DateInterval:', dateIntervalValue);
+                                        valueOnChange.apply(null, [valueField, false]);
+                                    }
+                                }
+                            }
+                        }, 300);
                     }
                     Mautic.removeLabelLoadingIndicator();
                 }, false, false, "POST");
@@ -403,6 +451,23 @@
             setTimeout(function() {
                 Mautic.initializeEventDatePickers();
 
+                // Check if we need to initialize date field with operator = 'date'
+                // This handles the case when modal is reopened with saved data
+                mQuery('input.event-date-value-placeholder[data-toggle="date"]').each(function() {
+                    var valueInput = mQuery(this);
+                    var fieldId = valueInput.attr('id');
+                    var fieldPrefix = fieldId.replace('_value', '');
+                    var operator = mQuery('#' + fieldPrefix + '_operator').val();
+                    var fieldSelect = mQuery('#' + fieldPrefix + '_field');
+
+                    // If operator is 'date', trigger AJAX to rebuild the select
+                    if ('date' === operator && fieldSelect.length) {
+                        console.log('Initializing date field on page load for saved data');
+                        // Trigger the field change to rebuild value field
+                        Mautic.updateEventFieldValues(fieldSelect[0]);
+                    }
+                });
+
                 // Initialize custom date row visibility for date fields
                 mQuery('select[data-toggle="date"]').each(function() {
                     var selectedValue = mQuery(this).val();
@@ -419,6 +484,26 @@
                             mQuery('.condition-custom-date-row').show();
                         } else {
                             mQuery('.condition-custom-date-row').hide();
+                        }
+                    });
+                });
+
+                // Before form submit, update custom date value to DateInterval format
+                mQuery('form').on('submit', function(e) {
+                    // Find all event field value selects with date operator
+                    mQuery('select[id$="_properties_value"]').each(function() {
+                        var valueSelect = mQuery(this);
+                        var fieldId = valueSelect.attr('id');
+                        var fieldPrefix = fieldId.replace('_value', '');
+                        var operator = mQuery('#' + fieldPrefix + '_operator').val();
+
+                        // If operator is 'date' and custom option is selected
+                        if ('date' === operator) {
+                            var customOption = valueSelect.find('option[data-custom=1]');
+                            if (customOption.length && customOption.prop('selected')) {
+                                // Update the custom option value with interval/unit
+                                Mautic.updateEventFieldValueOptions(valueSelect, true);
+                            }
                         }
                     });
                 });

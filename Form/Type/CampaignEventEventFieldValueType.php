@@ -140,27 +140,23 @@ class CampaignEventEventFieldValueType extends AbstractType
 
                 $form->add(
                     'value',
-                    ChoiceType::class,
+                    TextType::class,
                     [
-                        // Symfony expects 'label' => 'value'
-                        'choices'           => !empty($fieldValues) ? array_flip($fieldValues) : [],
-                        'label'             => 'mautic.form.field.form.value',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => [
-                            'class'                => 'form-control',
+                        'label'       => 'mautic.form.field.form.value',
+                        'label_attr'  => ['class' => 'control-label'],
+                        'attr'        => [
+                            'class'                => 'form-control event-date-value-placeholder',
                             'onchange'             => 'Mautic.updateEventFieldValueOptions(this)',
                             'data-toggle'          => $fieldType,
                             'data-onload-callback' => 'updateEventFieldValueOptions',
                         ],
-                        'choice_attr' => $choiceAttr,
                         'required'    => $supportsValue,
                         'constraints' => $supportsValue ? [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
                             ),
                         ] : [],
-                        'multiple' => $multiple,
-                        'data'     => $value,
+                        'data'        => $value,
                     ]
                 );
             } elseif (!$shouldShowAsText && ((!empty($fieldValues) || 'select' === $fieldType) && $supportsChoices)) {
