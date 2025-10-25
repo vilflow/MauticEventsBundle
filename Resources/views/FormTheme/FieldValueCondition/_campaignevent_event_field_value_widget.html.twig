@@ -321,8 +321,10 @@
                 var predefinedValues = ['anniversary', '+P0D', '-P1D', '+P1D'];
                 var isCustomSelected = (value === 'custom') || (value && /^[+-]PT?[0-9]+[DIMHY]$/i.test(value) && !predefinedValues.includes(value));
 
+                console.log('isCustomSelected:', isCustomSelected, '- value:', value);
+
                 if (isCustomSelected) {
-                    console.log('Custom option is selected');
+                    console.log('Custom option is selected, showing custom date row');
                     if (!updating) {
                         // Parse existing value if it's in DateInterval format: -/+ P/PT number unit
                         if (value && value !== 'custom') {
@@ -448,11 +450,15 @@
                     var operator = mQuery('#' + fieldPrefix + '_operator').val();
                     var fieldSelect = mQuery('#' + fieldPrefix + '_field');
 
+                    console.log('Found date placeholder input - operator:', operator, 'value:', valueInput.val());
+
                     // If operator is 'date', trigger AJAX to rebuild the select
                     if ('date' === operator && fieldSelect.length) {
                         console.log('Initializing date field on page load for saved data');
                         // Trigger the field change to rebuild value field
                         Mautic.updateEventFieldValues(fieldSelect[0]);
+                    } else {
+                        console.log('NOT triggering AJAX - operator is not date or field select not found');
                     }
                 });
 
