@@ -11,6 +11,34 @@
     </div>
 </div>
 
+<div class="row condition-custom-date-row" style="display: none;">
+    <div class="col-sm-offset-4 col-sm-4">
+        <div class="row">
+            <div class="form-group col-xs-12 ">
+                <div class="input-group">
+                    <span class="input-group-addon preaddon">
+                        <i class="symbol-hashtag"></i>
+                    </span>
+                    <input autocomplete="false" type="number" id="event-field-custom-date-interval" class="form-control" value="1" onchange="Mautic.updateEventFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="row">
+            <div class="form-group col-xs-12 ">
+                <select id="event-field-custom-date-unit" class="form-control chosen" autocomplete="false" onchange="Mautic.updateEventFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
+                    {% for interval in ['i', 'h', 'd', 'm', 'y'] %}
+                      <option {% if 'd' == interval %}selected{% endif %} value="{{ interval }}">
+                          {{- ('mautic.campaign.event.intervalunit.choice.' ~ interval)|trans -}}
+                      </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     .eventdatepicker {
         background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999" width="16" height="16"><path d="M7 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm7-8H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3V2h-2v4h-6V2h-2v4zm9 18H4V8h16v16zm-5-5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm5 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-10 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>') !important;
@@ -132,45 +160,42 @@
                             // For date fields, watch for value changes
                             if ('date' === valueFieldAttrs['data-toggle']) {
                                 var selectElem = mQuery('#' + valueFieldAttrs['id']);
-                                var lastValue = selectElem.val();
 
-                                // Create a mutation observer to watch the select element
-                                var observer = new MutationObserver(function(mutations) {
+                                // Function to handle showing/hiding custom date row
+                                var handleCustomDateVisibility = function() {
                                     var currentValue = selectElem.val();
-                                    if (currentValue !== lastValue) {
-                                        lastValue = currentValue;
-                                        console.log('VALUE CHANGED - value:', currentValue);
-                                        if ('custom' === currentValue) {
-                                            mQuery('.condition-custom-date-row').show();
-                                        } else {
-                                            mQuery('.condition-custom-date-row').hide();
-                                        }
-                                    }
-                                });
-
-                                // Start observing the select element for attribute changes
-                                observer.observe(selectElem[0], {
-                                    attributes: true,
-                                    attributeFilter: ['value'],
-                                    subtree: false
-                                });
-
-                                // Also watch the Chosen container for display changes
-                                var chosenId = valueFieldAttrs['id'] + '_chosen';
-                                var chosenElem = mQuery('#' + chosenId);
-                                if (chosenElem.length) {
-                                    chosenElem.on('click', function() {
+                                    console.log('VALUE CHECK - value:', currentValue);
+                                    if ('custom' === currentValue) {
+                                        console.log('Showing custom date row');
+                                        mQuery('.condition-custom-date-row').show();
+                                        // Initialize Chosen on the unit select if not already done
                                         setTimeout(function() {
-                                            var val = selectElem.val();
-                                            console.log('CHOSEN CLICKED - value:', val);
-                                            if ('custom' === val) {
-                                                mQuery('.condition-custom-date-row').show();
-                                            } else {
-                                                mQuery('.condition-custom-date-row').hide();
+                                            var unitSelect = mQuery('#event-field-custom-date-unit');
+                                            if (unitSelect.length && !mQuery('#event-field-custom-date-unit_chosen').length) {
+                                                Mautic.activateChosenSelect(unitSelect);
                                             }
                                         }, 100);
-                                    });
-                                }
+                                    } else {
+                                        console.log('Hiding custom date row');
+                                        mQuery('.condition-custom-date-row').hide();
+                                    }
+                                };
+
+                                // Bind to both regular change event and Chosen-specific event
+                                selectElem.on('change', handleCustomDateVisibility);
+                                selectElem.on('chosen:updated', handleCustomDateVisibility);
+
+                                // Also bind to the Chosen result select event
+                                selectElem.on('chosen:showing_dropdown', function() {
+                                    setTimeout(function() {
+                                        mQuery('#' + valueFieldAttrs['id'] + '_chosen .chosen-results .active-result').on('click', function() {
+                                            setTimeout(handleCustomDateVisibility, 50);
+                                        });
+                                    }, 50);
+                                });
+
+                                // Check initial value and show/hide accordingly
+                                setTimeout(handleCustomDateVisibility, 200);
                             }
                         } else if (mQuery.isEmptyObject(response.options) || response.fieldType === 'number') {
                             // For date fields or number fields with no options, create a text/number input
@@ -261,27 +286,60 @@
             var fieldId = mQuery(field).attr('id');
             var fieldPrefix = fieldId.slice(0, -5);
             var operator = mQuery('#' + fieldPrefix + 'operator').val();
-            var fieldType = mQuery('#' + fieldPrefix + 'value').attr('data-toggle');
 
-            // For date fields, show custom date row only when 'custom' option is selected
-            if ('date' === fieldType) {
-                var valueField = mQuery(field);
-                var selectedValue = valueField.val();
-                console.log('updateEventFieldValueOptions - fieldType:', fieldType, 'selectedValue:', selectedValue);
+            // Check if operator is 'date' (not field type!)
+            if ('date' === operator) {
+                var customOption = mQuery(field).find('option[data-custom=1]');
+                var value = mQuery(field).val();
 
-                // Show custom date inputs only if 'custom' value is selected
-                if ('custom' === selectedValue) {
-                    console.log('Showing custom date row');
+                var customSelected = mQuery(customOption).prop('selected');
+                if (customSelected) {
+                    if (!updating) {
+                        // Parse existing value if it's in DateInterval format: -/+ P/PT number unit
+                        var regex = /(\+|-)(PT?)([0-9]*)([DIMHY])$/g;
+                        var match = regex.exec(value);
+                        if (match) {
+                            var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
+                            var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+
+                            mQuery('#event-field-custom-date-interval').val(interval);
+                            mQuery('#event-field-custom-date-unit').val(unit.toLowerCase());
+                        }
+                    } else {
+                        // Convert interval/unit into PHP DateInterval format
+                        var interval = mQuery('#event-field-custom-date-interval').val();
+                        var unit = mQuery('#event-field-custom-date-unit').val();
+
+                        var prefix = ("i" == unit || "h" == unit) ? "PT" : "P";
+                        // DateInterval uses M for minutes instead of i
+                        if ("i" === unit) {
+                            unit = "m";
+                        }
+
+                        unit = unit.toUpperCase();
+
+                        var operatorSign = "+";
+                        if (parseInt(interval) < 0) {
+                            operatorSign = "-";
+                            interval = -1 * parseInt(interval);
+                        }
+                        var newValue = operatorSign + prefix + interval + unit;
+                        customOption.attr('value', newValue);
+                    }
                     mQuery('.condition-custom-date-row').show();
+                    // Initialize Chosen on unit select if needed
+                    setTimeout(function() {
+                        var unitSelect = mQuery('#event-field-custom-date-unit');
+                        if (unitSelect.length && !mQuery('#event-field-custom-date-unit_chosen').length) {
+                            Mautic.activateChosenSelect(unitSelect);
+                        }
+                    }, 100);
                 } else {
-                    console.log('Hiding custom date row');
                     mQuery('.condition-custom-date-row').hide();
                 }
-                return;
+            } else {
+                mQuery('.condition-custom-date-row').hide();
             }
-
-            // For non-date fields, hide the custom date row
-            mQuery('.condition-custom-date-row').hide();
         };
 
         // Initialize date picker for date fields
