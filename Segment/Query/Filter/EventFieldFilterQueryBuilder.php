@@ -183,20 +183,22 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
     /**
      * Check if a field is a date/datetime field that should be compared without time
+     * This includes both DATE_MUTABLE and DATETIME_MUTABLE fields
      */
     private function isDateField(string $fieldColumn): bool
     {
+        // All these fields should use DATE() comparison to ignore time component
         $dateFields = [
-            'date_modified',
-            'date_entered',
-            'early_bird_reg_deadline_c',
-            'event_start_date_c',
-            'submission_deadline_c',
-            'event_end_date_c',
-            'early_reg_deadline_c',
-            'final_reg_deadline_c',
-            'created_at',
-            'updated_at',
+            'date_modified',        // DATETIME_MUTABLE
+            'date_entered',         // DATETIME_MUTABLE
+            'early_bird_reg_deadline_c',  // DATE_MUTABLE
+            'event_start_date_c',   // DATE_MUTABLE
+            'submission_deadline_c', // DATE_MUTABLE
+            'event_end_date_c',     // DATE_MUTABLE
+            'early_reg_deadline_c', // DATE_MUTABLE
+            'final_reg_deadline_c', // DATE_MUTABLE
+            'created_at',           // DATETIME_MUTABLE
+            'updated_at',           // DATETIME_MUTABLE
         ];
 
         return in_array($fieldColumn, $dateFields);

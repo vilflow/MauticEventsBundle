@@ -230,61 +230,61 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             // Event Dates
             'event_date_modified' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_date_modified'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_date_entered' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_date_entered'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_early_bird_reg_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_early_bird_reg_deadline_c'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'date'],  // DATE_MUTABLE - only date, no time
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_start_date_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_start_date_c'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'date'],  // DATE_MUTABLE - only date, no time
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_submission_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_submission_deadline_c'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'date'],  // DATE_MUTABLE - only date, no time
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_end_date_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_end_date_c'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'date'],  // DATE_MUTABLE - only date, no time
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_early_reg_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_early_reg_deadline_c'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'date'],  // DATE_MUTABLE - only date, no time
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_final_reg_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_final_reg_deadline_c'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'date'],  // DATE_MUTABLE - only date, no time
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_created_at' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_created_at'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_updated_at' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_updated_at'),
-                'properties' => ['type' => 'datetime'],
+                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
