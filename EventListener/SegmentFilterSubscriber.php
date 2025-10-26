@@ -230,13 +230,13 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             // Event Dates
             'event_date_modified' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_date_modified'),
-                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
+                'properties' => ['type' => 'date'],  // DATETIME_MUTABLE in DB, but filter by date only
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_date_entered' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_date_entered'),
-                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
+                'properties' => ['type' => 'date'],  // DATETIME_MUTABLE in DB, but filter by date only
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
@@ -278,13 +278,13 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             ],
             'event_created_at' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_created_at'),
-                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
+                'properties' => ['type' => 'date'],  // DATETIME_MUTABLE in DB, but filter by date only
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],
             'event_updated_at' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_updated_at'),
-                'properties' => ['type' => 'datetime'],  // DATETIME_MUTABLE - allows datetime picker
+                'properties' => ['type' => 'date'],  // DATETIME_MUTABLE in DB, but filter by date only
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'event',
             ],

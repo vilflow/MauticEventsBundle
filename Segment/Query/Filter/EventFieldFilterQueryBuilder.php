@@ -19,6 +19,19 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterOperator = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();
 
+        // Map filter field names to actual column names
+        $fieldColumn = $this->mapFilterFieldToColumn($filter->getField());
+
+        // Check if this is a date field - if so, use DATE() function to compare only date part without time
+        $isDateField = $this->isDateField($fieldColumn);
+
+        // For date fields with comparison operators, convert parameters to date-only format first
+        // This must be done BEFORE generating parameter names and holders
+        $useDateOnlyComparison = $isDateField && in_array($filterOperator, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte']);
+        if ($useDateOnlyComparison) {
+            $filterParameters = $this->convertToDateOnly($filterParameters);
+        }
+
         if (is_array($filterParameters)) {
             $parameters = [];
             foreach ($filterParameters as $filterParameter) {
@@ -37,11 +50,6 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                        ->from(MAUTIC_TABLE_PREFIX.'event_contacts', $tableAlias.'_ec')
                        ->innerJoin($tableAlias.'_ec', MAUTIC_TABLE_PREFIX.'events', $tableAlias.'_e', $tableAlias.'_ec.event_id = '.$tableAlias.'_e.id');
 
-        // Map filter field names to actual column names
-        $fieldColumn = $this->mapFilterFieldToColumn($filter->getField());
-
-        // Check if this is a date field - if so, use DATE() function to compare only date part without time
-        $isDateField = $this->isDateField($fieldColumn);
         $fieldExpression = $isDateField ? 'DATE('.$tableAlias.'_e.'.$fieldColumn.')' : $tableAlias.'_e.'.$fieldColumn;
 
         switch ($filterOperator) {
@@ -60,9 +68,12 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'neq':
-                if ($isDateField) {
-                    $filterParameters = $this->convertToDateOnly($filterParameters);
-                    $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') != '.$filterParametersHolder);
+                if ($useDateOnlyComparison) {
+                    // Use literal value for date comparison to avoid type conversion issues
+                    $dateValue = is_array($filterParameters) ? reset($filterParameters) : $filterParameters;
+                    $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') != '.$subQueryBuilder->expr()->literal($dateValue));
+                    // Don't bind parameters for date comparisons since we're using literals
+                    $parameters = null;
                 } else {
                     $subQueryBuilder->andWhere($subQueryBuilder->expr()->neq($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
                 }
@@ -87,11 +98,13 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'lt':
             case 'lte':
             case 'regexp':
-                if ($isDateField && in_array($filterOperator, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
+                if ($useDateOnlyComparison) {
                     // For date fields, use DATE() function to compare only the date part
-                    // When comparing dates, we need to extract the date part from the parameter value too
-                    $filterParameters = $this->convertToDateOnly($filterParameters);
-                    $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') '.$this->getOperatorSymbol($filterOperator).' '.$filterParametersHolder);
+                    // Use literal value to avoid type conversion issues
+                    $dateValue = is_array($filterParameters) ? reset($filterParameters) : $filterParameters;
+                    $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') '.$this->getOperatorSymbol($filterOperator).' '.$subQueryBuilder->expr()->literal($dateValue));
+                    // Don't bind parameters for date comparisons since we're using literals
+                    $parameters = null;
                 } else {
                     $subQueryBuilder->andWhere($subQueryBuilder->expr()->$filterOperator($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
                 }
@@ -101,7 +114,10 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 throw new \Exception('Unknown operator "'.$filterOperator.'" for event field filter');
         }
 
-        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        // Only bind parameters if we're not using literals (date comparisons use literals)
+        if ($parameters !== null) {
+            $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        }
 
         return $queryBuilder;
     }
@@ -240,22 +256,44 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
     /**
      * Extract date-only part from a parameter value
+     * Handles various datetime formats including DateTime objects
      *
-     * @param mixed $param Parameter value
-     * @return mixed Extracted date or original value
+     * @param mixed $param Parameter value (string, DateTime, or other)
+     * @return string Extracted date in Y-m-d format or original value
      */
     private function extractDateFromParameter($param)
     {
+        // Handle DateTime objects
+        if ($param instanceof \DateTime || $param instanceof \DateTimeInterface) {
+            return $param->format('Y-m-d');
+        }
+
+        // Handle string datetime formats
         if (is_string($param) && !empty($param)) {
-            // Check if parameter contains time information (contains space followed by time pattern)
-            if (preg_match('/^(\d{4}-\d{2}-\d{2})\s\d{2}:\d{2}:\d{2}/', $param, $matches)) {
+            // Try to match various datetime formats:
+            // YYYY-MM-DD HH:MM:SS (standard MySQL datetime)
+            // YYYY-MM-DD HH:MM:SS.microseconds
+            // YYYY-MM-DDTHH:MM:SS (ISO 8601)
+            // YYYY-MM-DDTHH:MM:SS.microseconds
+            // YYYY-MM-DDTHH:MM:SS+00:00 (ISO 8601 with timezone)
+            if (preg_match('/^(\d{4}-\d{2}-\d{2})[\sT]\d{2}:\d{2}/', $param, $matches)) {
                 // Extract only the date part (YYYY-MM-DD)
                 return $matches[1];
-            } elseif (preg_match('/^(\d{4}-\d{2}-\d{2})/', $param, $matches)) {
-                // Already in date format, keep it
+            }
+
+            // Already in date-only format YYYY-MM-DD
+            if (preg_match('/^(\d{4}-\d{2}-\d{2})$/', $param, $matches)) {
                 return $matches[1];
             }
+
+            // Try to parse as a date/datetime string using strtotime
+            $timestamp = strtotime($param);
+            if ($timestamp !== false) {
+                return date('Y-m-d', $timestamp);
+            }
         }
+
+        // Return original value if we can't parse it
         return $param;
     }
 }
