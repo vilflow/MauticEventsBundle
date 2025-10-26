@@ -61,6 +61,8 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'neq':
                 if ($isDateField) {
+                    $filterParameters = is_array($filterParameters) ? $filterParameters : [$filterParameters];
+                    $this->convertDateParametersToDateOnly($filterParameters);
                     $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') != '.$filterParametersHolder);
                 } else {
                     $subQueryBuilder->andWhere($subQueryBuilder->expr()->neq($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
@@ -88,6 +90,9 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'regexp':
                 if ($isDateField && in_array($filterOperator, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
                     // For date fields, use DATE() function to compare only the date part
+                    // When comparing dates, we need to extract the date part from the parameter value too
+                    $filterParameters = is_array($filterParameters) ? $filterParameters : [$filterParameters];
+                    $this->convertDateParametersToDateOnly($filterParameters);
                     $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') '.$this->getOperatorSymbol($filterOperator).' '.$filterParametersHolder);
                 } else {
                     $subQueryBuilder->andWhere($subQueryBuilder->expr()->$filterOperator($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
@@ -212,5 +217,25 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         ];
 
         return $operatorMap[$operator] ?? '=';
+    }
+
+    /**
+     * Convert date parameters to date-only format (Y-m-d) if they contain time information
+     * This ensures dates like '2025-10-23 10:00:01' become '2025-10-23'
+     */
+    private function convertDateParametersToDateOnly(array &$filterParameters): void
+    {
+        foreach ($filterParameters as &$param) {
+            if (is_string($param) && !empty($param)) {
+                // Check if parameter contains time information (contains space followed by time pattern)
+                if (preg_match('/^(\d{4}-\d{2}-\d{2})\s\d{2}:\d{2}:\d{2}/', $param, $matches)) {
+                    // Extract only the date part (YYYY-MM-DD)
+                    $param = $matches[1];
+                } elseif (preg_match('/^(\d{4}-\d{2}-\d{2})/', $param, $matches)) {
+                    // Already in date format, keep it
+                    $param = $matches[1];
+                }
+            }
+        }
     }
 }

@@ -46,25 +46,25 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_external_id'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_name' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_name'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_description' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_description'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_about_event_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_about_event_c'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event URLs
@@ -72,79 +72,79 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_program_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_history_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_history_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_speakers_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_speakers_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_submission_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_submission_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_faq_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_faq_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_venue_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_venue_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_visa_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_visa_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_registration_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_registration_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_facebook_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_facebook_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_feedback_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_feedback_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_testimonials_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_testimonials_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_website_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_website_url_c') . ' (Legacy)',
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_easy_payment_url_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_easy_payment_url_c'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Redirect URLs
@@ -152,13 +152,13 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_decline_redirect'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_accept_redirect' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_accept_redirect'),
                 'properties' => ['type' => 'url'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Contact Information
@@ -166,7 +166,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_manager_email_c'),
                 'properties' => ['type' => 'email'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('email'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_manager_name_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_manager_name_c'),
@@ -178,7 +178,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_organizer_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_organizer_c'),
@@ -192,7 +192,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Details
@@ -200,31 +200,31 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_isbn_number_c'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_wire_transfer_data_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_wire_transfer_data_c'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_duration_minutes' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_duration_minutes'),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_duration_hours' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_duration_hours'),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_abstract_book_image_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_abstract_book_image_c'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Dates
@@ -232,61 +232,61 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_date_modified'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_date_entered' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_date_entered'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_early_bird_reg_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_early_bird_reg_deadline_c'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_start_date_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_start_date_c'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_submission_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_submission_deadline_c'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_end_date_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_end_date_c'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_early_reg_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_early_reg_deadline_c'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_final_reg_deadline_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_final_reg_deadline_c'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_created_at' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_created_at'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_updated_at' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_updated_at'),
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Location
@@ -304,7 +304,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_country_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_country_c'),
@@ -320,7 +320,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_field_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_field_c'),
@@ -333,7 +333,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Financial
@@ -341,13 +341,13 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_currency_id'),
                 'properties' => ['type' => 'text'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('text'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_budget' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_budget'),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
 
             // Event Status
@@ -355,7 +355,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.events.segment.event_deleted'),
                 'properties' => ['type' => 'boolean'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('boolean'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_round_c' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_round_c'),
@@ -370,7 +370,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_activity_status_type' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_activity_status_type'),
@@ -382,7 +382,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
             'event_invite_templates' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_invite_templates'),
@@ -395,7 +395,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
                     ],
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('select'),
-                'object'     => 'lead',
+                'object'     => 'event',
             ],
         ];
 
