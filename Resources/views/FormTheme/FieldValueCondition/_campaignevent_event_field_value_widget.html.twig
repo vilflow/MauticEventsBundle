@@ -319,7 +319,8 @@
 
                 // Check if custom is selected (either value='custom' or value is a custom DateInterval)
                 var predefinedValues = ['anniversary', '+P0D', '-P1D', '+P1D'];
-                var isCustomSelected = (value === 'custom') || (value && /^[+-]PT?[0-9]+[DIMHY]$/i.test(value) && !predefinedValues.includes(value));
+                var customOptionSelected = customOption.length && customOption.is(':selected');
+                var isCustomSelected = customOptionSelected || value === 'custom' || (value && /^[+-]PT?[0-9]+[DIMHY]$/i.test(value) && !predefinedValues.includes(value));
 
                 console.log('isCustomSelected:', isCustomSelected, '- value:', value);
 
@@ -363,7 +364,9 @@
                         }
                         var newValue = operatorSign + prefix + interval + unit;
                         customOption.attr('value', newValue);
-                    }
+                        customOption.prop('selected', true);
+                        mQuery(field).val(newValue);
+                }
                     mQuery('.condition-custom-date-row').show();
                     // Initialize Chosen on unit select if needed
                     setTimeout(function() {
@@ -435,8 +438,8 @@
             });
         };
 
-        // Initialize custom date row visibility and datepickers on page load
-        mQuery(document).ready(function() {
+        // Shared initializer so the UI can re-run when the modal is reopened
+        Mautic.initEventFieldValueUi = function() {
             // Give a small delay to ensure all assets are loaded
             setTimeout(function() {
                 Mautic.initializeEventDatePickers();
@@ -454,7 +457,7 @@
 
                     // If operator is 'date', trigger AJAX to rebuild the select
                     if ('date' === operator && fieldSelect.length) {
-                        console.log('Initializing date field on page load for saved data');
+                        console.log('Initializing date field for saved data');
                         // Trigger the field change to rebuild value field
                         Mautic.updateEventFieldValues(fieldSelect[0]);
                     } else {
@@ -472,7 +475,7 @@
                     }
 
                     // Bind change event to show/hide custom date row
-                    mQuery(this).on('change', function() {
+                    mQuery(this).off('change.eventfieldcustom').on('change.eventfieldcustom', function() {
                         var value = mQuery(this).val();
                         if ('custom' === value) {
                             mQuery('.condition-custom-date-row').show();
@@ -483,7 +486,7 @@
                 });
 
                 // Before form submit, update custom date value to DateInterval format
-                mQuery('form').on('submit', function(e) {
+                mQuery('form').off('submit.eventfieldcustom').on('submit.eventfieldcustom', function() {
                     // Find all event field value selects with date operator
                     mQuery('select[id$="_properties_value"]').each(function() {
                         var valueSelect = mQuery(this);
@@ -502,7 +505,12 @@
                     });
                 });
             }, 500);
-        });
+        };
+    }
+
+    // Re-run initialization if the template is injected again (modal reopened)
+    if (typeof Mautic.initEventFieldValueUi === 'function') {
+        Mautic.initEventFieldValueUi();
     }
 </script>
 {% endblock %}
