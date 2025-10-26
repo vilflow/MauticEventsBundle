@@ -61,7 +61,9 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'neq':
                 if ($isDateField) {
-                    $filterParameters = is_array($filterParameters) ? $filterParameters : [$filterParameters];
+                    if (!is_array($filterParameters)) {
+                        $filterParameters = [$filterParameters];
+                    }
                     $this->convertDateParametersToDateOnly($filterParameters);
                     $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') != '.$filterParametersHolder);
                 } else {
@@ -91,7 +93,9 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 if ($isDateField && in_array($filterOperator, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
                     // For date fields, use DATE() function to compare only the date part
                     // When comparing dates, we need to extract the date part from the parameter value too
-                    $filterParameters = is_array($filterParameters) ? $filterParameters : [$filterParameters];
+                    if (!is_array($filterParameters)) {
+                        $filterParameters = [$filterParameters];
+                    }
                     $this->convertDateParametersToDateOnly($filterParameters);
                     $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') '.$this->getOperatorSymbol($filterOperator).' '.$filterParametersHolder);
                 } else {
