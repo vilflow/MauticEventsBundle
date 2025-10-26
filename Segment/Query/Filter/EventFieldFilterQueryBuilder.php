@@ -61,10 +61,7 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'neq':
                 if ($isDateField) {
-                    if (!is_array($filterParameters)) {
-                        $filterParameters = [$filterParameters];
-                    }
-                    $this->convertDateParametersToDateOnly($filterParameters);
+                    $filterParameters = $this->convertToDateOnly($filterParameters);
                     $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') != '.$filterParametersHolder);
                 } else {
                     $subQueryBuilder->andWhere($subQueryBuilder->expr()->neq($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
@@ -93,10 +90,7 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 if ($isDateField && in_array($filterOperator, ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'])) {
                     // For date fields, use DATE() function to compare only the date part
                     // When comparing dates, we need to extract the date part from the parameter value too
-                    if (!is_array($filterParameters)) {
-                        $filterParameters = [$filterParameters];
-                    }
-                    $this->convertDateParametersToDateOnly($filterParameters);
+                    $filterParameters = $this->convertToDateOnly($filterParameters);
                     $subQueryBuilder->andWhere('DATE('.$tableAlias.'_e.'.$fieldColumn.') '.$this->getOperatorSymbol($filterOperator).' '.$filterParametersHolder);
                 } else {
                     $subQueryBuilder->andWhere($subQueryBuilder->expr()->$filterOperator($tableAlias.'_e.'.$fieldColumn, $filterParametersHolder));
@@ -228,20 +222,40 @@ class EventFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * Convert date parameters to date-only format (Y-m-d) if they contain time information
      * This ensures dates like '2025-10-23 10:00:01' become '2025-10-23'
+     * Handles both single values and arrays
+     *
+     * @param mixed $filterParameters Single value or array of values
+     * @return mixed Converted value(s) in the same format (single value or array)
      */
-    private function convertDateParametersToDateOnly(array &$filterParameters): void
+    private function convertToDateOnly($filterParameters)
     {
-        foreach ($filterParameters as &$param) {
-            if (is_string($param) && !empty($param)) {
-                // Check if parameter contains time information (contains space followed by time pattern)
-                if (preg_match('/^(\d{4}-\d{2}-\d{2})\s\d{2}:\d{2}:\d{2}/', $param, $matches)) {
-                    // Extract only the date part (YYYY-MM-DD)
-                    $param = $matches[1];
-                } elseif (preg_match('/^(\d{4}-\d{2}-\d{2})/', $param, $matches)) {
-                    // Already in date format, keep it
-                    $param = $matches[1];
-                }
+        if (is_array($filterParameters)) {
+            return array_map(function($param) {
+                return $this->extractDateFromParameter($param);
+            }, $filterParameters);
+        } else {
+            return $this->extractDateFromParameter($filterParameters);
+        }
+    }
+
+    /**
+     * Extract date-only part from a parameter value
+     *
+     * @param mixed $param Parameter value
+     * @return mixed Extracted date or original value
+     */
+    private function extractDateFromParameter($param)
+    {
+        if (is_string($param) && !empty($param)) {
+            // Check if parameter contains time information (contains space followed by time pattern)
+            if (preg_match('/^(\d{4}-\d{2}-\d{2})\s\d{2}:\d{2}:\d{2}/', $param, $matches)) {
+                // Extract only the date part (YYYY-MM-DD)
+                return $matches[1];
+            } elseif (preg_match('/^(\d{4}-\d{2}-\d{2})/', $param, $matches)) {
+                // Already in date format, keep it
+                return $matches[1];
             }
         }
+        return $param;
     }
 }
