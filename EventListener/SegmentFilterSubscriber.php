@@ -353,7 +353,13 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             // Event Status
             'event_deleted' => [
                 'label'      => $this->translator->trans('mautic.events.segment.event_deleted'),
-                'properties' => ['type' => 'boolean'],
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => [
+                        'Yes' => '1',
+                        'No' => '0',
+                    ],
+                ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('boolean'),
                 'object'     => 'event',
             ],
