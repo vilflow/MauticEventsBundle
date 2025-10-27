@@ -448,12 +448,235 @@ class EventContactRepository extends CommonRepository
                     ->setParameter($parameter, $trimmedValue);
                 break;
             case 'date':
-                $qb->andWhere($column.' = :'.$parameter)
-                    ->setParameter($parameter, $trimmedValue);
+                // Handle anniversary special case - match month and day only
+                if ('anniversary' === $trimmedValue) {
+                    // For anniversary, extract month and day and compare
+                    $dateValue = $this->convertRelativeDateToActual($trimmedValue);
+                    $qb->andWhere('SUBSTRING('.$column.', 6, 5) = SUBSTRING(:'.$parameter.', 6, 5)')
+                        ->setParameter($parameter, $dateValue);
+                } else {
+                    // Check if this is a relative interval (e.g., -30, +30, -P50D, +P1M)
+                    $isRelativeInterval = $this->isRelativeInterval($trimmedValue);
+
+                    if ($isRelativeInterval) {
+                        // For relative intervals: create a RANGE filter
+                        // -30 means: between (today - 30 days) and today
+                        // +30 means: between today and (today + 30 days)
+                        $rangeParams = $this->calculateDateRange($trimmedValue);
+                        $startDate = $rangeParams['start'];
+                        $endDate = $rangeParams['end'];
+
+                        // Get field metadata to check if it's a datetime or date field
+                        $metadata = $this->_em->getClassMetadata(Event::class);
+                        $fieldName = str_replace('e.', '', $column);
+
+                        $useSubstring = false;
+                        if ($metadata->hasField($fieldName)) {
+                            $fieldMapping = $metadata->getFieldMapping($fieldName);
+                            $fieldType = $fieldMapping['type'] ?? 'string';
+                            $useSubstring = in_array($fieldType, ['datetime', 'datetimetz', 'datetime_immutable']);
+                        }
+
+                        // Build BETWEEN query
+                        if ($useSubstring) {
+                            // For datetime fields, extract date part first
+                            $qb->andWhere('SUBSTRING('.$column.', 1, 10) BETWEEN :startDate AND :endDate')
+                                ->setParameter('startDate', $startDate)
+                                ->setParameter('endDate', $endDate);
+                        } else {
+                            // For date fields, direct comparison
+                            $qb->andWhere($column.' BETWEEN :startDate AND :endDate')
+                                ->setParameter('startDate', $startDate)
+                                ->setParameter('endDate', $endDate);
+                        }
+                    } else {
+                        // For absolute dates (e.g., "2025-10-27", "today", "yesterday"): exact match
+                        $dateValue = $this->convertRelativeDateToActual($trimmedValue);
+
+                        // Get field metadata to check if it's a datetime or date field
+                        $metadata = $this->_em->getClassMetadata(Event::class);
+                        $fieldName = str_replace('e.', '', $column);
+
+                        if ($metadata->hasField($fieldName)) {
+                            $fieldMapping = $metadata->getFieldMapping($fieldName);
+                            $fieldType = $fieldMapping['type'] ?? 'string';
+
+                            // For datetime fields, we need to extract just the date part
+                            if (in_array($fieldType, ['datetime', 'datetimetz', 'datetime_immutable'])) {
+                                // Use SUBSTRING to extract YYYY-MM-DD from YYYY-MM-DD HH:MM:SS
+                                $qb->andWhere('SUBSTRING('.$column.', 1, 10) = :'.$parameter)
+                                    ->setParameter($parameter, $dateValue);
+                            } else {
+                                // For date fields, direct comparison works
+                                $qb->andWhere($column.' = :'.$parameter)
+                                    ->setParameter($parameter, $dateValue);
+                            }
+                        } else {
+                            // Fallback: assume datetime and extract date part
+                            $qb->andWhere('SUBSTRING('.$column.', 1, 10) = :'.$parameter)
+                                ->setParameter($parameter, $dateValue);
+                        }
+                    }
+                }
                 break;
             default:
                 $qb->andWhere($column.' = :'.$parameter)
                     ->setParameter($parameter, $trimmedValue);
+        }
+    }
+
+    /**
+     * Check if value is a relative interval that should create a date range
+     * Returns true for values like: -30, +30, -P50D, +P1M (not for +P0D, -P1D, +P1D which are today/yesterday/tomorrow)
+     */
+    private function isRelativeInterval(string $value): bool
+    {
+        // Check for ISO 8601 duration format with +/- prefix
+        if (preg_match('/^([+-])(PT?)(\d+)([DIMHWY])$/i', $value, $matches)) {
+            $amount = (int)$matches[3];
+
+            // Special cases that are exact dates, not ranges:
+            // +P0D = today, -P1D = yesterday, +P1D = tomorrow
+            if ($amount === 0) {
+                return false; // +P0D = today (exact date)
+            }
+            if ($amount === 1 && strtoupper($matches[4]) === 'D') {
+                return false; // -P1D = yesterday, +P1D = tomorrow (exact dates)
+            }
+
+            return true; // Everything else is a range
+        }
+
+        return false; // Non-interval values (today, yesterday, 2025-10-27, etc.) are exact dates
+    }
+
+    /**
+     * Calculate date range for relative interval
+     * For negative values (-30): returns range from (today - interval) to today
+     * For positive values (+30): returns range from today to (today + interval)
+     */
+    private function calculateDateRange(string $value): array
+    {
+        $today = new \DateTime('now', new \DateTimeZone('UTC'));
+        $today->setTime(0, 0, 0); // Reset to start of day
+
+        // Parse the interval
+        if (preg_match('/^([+-])(PT?)(\d+)([DIMHWY])$/i', $value, $matches)) {
+            $sign = $matches[1];
+            $timePrefix = strtoupper($matches[2]);
+            $amount = $matches[3];
+            $unit = strtoupper($matches[4]);
+
+            // For time-based intervals (PT prefix with H or M), we need different handling
+            $isTimeInterval = ($timePrefix === 'PT' && in_array($unit, ['H', 'M']));
+
+            // Convert unit to DateTime modifier format
+            $unitMap = [
+                'D' => 'day',
+                'W' => 'week',
+                'M' => $isTimeInterval ? 'minute' : 'month',
+                'Y' => 'year',
+                'H' => 'hour',
+                'I' => 'minute',
+            ];
+
+            $modifier = $amount . ' ' . ($unitMap[$unit] ?? 'day');
+            if ((int)$amount !== 1) {
+                $modifier .= 's';
+            }
+
+            if ($sign === '-') {
+                // Negative: from (today - interval) to today
+                // Example: -30 days means from 30 days ago to today
+                $startDate = clone $today;
+                $startDate->modify('-' . $modifier);
+                $endDate = clone $today;
+
+                return [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ];
+            } else {
+                // Positive: from today to (today + interval)
+                // Example: +30 days means from today to 30 days from now
+                $startDate = clone $today;
+                $endDate = clone $today;
+                $endDate->modify('+' . $modifier);
+
+                return [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ];
+            }
+        }
+
+        // Fallback: return today to today (exact match)
+        return [
+            'start' => $today->format('Y-m-d'),
+            'end' => $today->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * Convert relative date values to actual dates
+     * Handles values like '+P0D' (today), '-P1D' (yesterday), '+P50D' (-50 days), 'anniversary'
+     * Also handles time intervals: '-PT5H' (-5 hours), '+PT30M' (+30 minutes)
+     */
+    private function convertRelativeDateToActual(string $value): string
+    {
+        // Handle ISO 8601 duration format with +/- prefix
+        // Matches: +P50D, -P1D, +PT5H, -PT30M, +P2W, +P3M, +P1Y
+        if (preg_match('/^([+-])(PT?)(\d+)([DIMHWY])$/i', $value, $matches)) {
+            $sign = $matches[1];
+            $timePrefix = strtoupper($matches[2]); // 'PT' for time intervals (hours, minutes), 'P' for date intervals
+            $amount = $matches[3];
+            $unit = strtoupper($matches[4]);
+
+            // For time-based intervals (PT prefix with H or M), we need different handling
+            $isTimeInterval = ($timePrefix === 'PT' && in_array($unit, ['H', 'M']));
+
+            // Convert unit to DateTime modifier format
+            $unitMap = [
+                'D' => 'day',
+                'W' => 'week',
+                'M' => $isTimeInterval ? 'minute' : 'month', // M after PT = minute, M after P = month
+                'Y' => 'year',
+                'H' => 'hour',
+                'I' => 'minute', // Alternative notation for minutes
+            ];
+
+            $modifier = $sign . $amount . ' ' . ($unitMap[$unit] ?? 'day');
+            if ((int)$amount !== 1) {
+                $modifier .= 's';
+            }
+
+            $date = new \DateTime('now', new \DateTimeZone('UTC'));
+            $date->modify($modifier);
+
+            return $date->format('Y-m-d');
+        }
+
+        // Handle special keywords
+        switch (strtolower($value)) {
+            case 'today':
+                return (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d');
+            case 'yesterday':
+                return (new \DateTime('yesterday', new \DateTimeZone('UTC')))->format('Y-m-d');
+            case 'tomorrow':
+                return (new \DateTime('tomorrow', new \DateTimeZone('UTC')))->format('Y-m-d');
+            case 'anniversary':
+                // For anniversary, return today's date (month-day matching will be done in the query)
+                return (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d');
+            default:
+                // If it's already a valid date format, return as-is
+                // Otherwise try to parse it
+                try {
+                    $date = new \DateTime($value, new \DateTimeZone('UTC'));
+                    return $date->format('Y-m-d');
+                } catch (\Exception $e) {
+                    // If parsing fails, return original value
+                    return $value;
+                }
         }
     }
 

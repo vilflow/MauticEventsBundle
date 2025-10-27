@@ -78,8 +78,22 @@ class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $hasEvent = $this->eventContactRepository->contactHasEventByField($lead->getId(), $field, $operator, $value);
-            $event->setResult($hasEvent);
+            try {
+                $hasEvent = $this->eventContactRepository->contactHasEventByField($lead->getId(), $field, $operator, $value);
+                $event->setResult($hasEvent);
+                error_log(sprintf(
+                    'CAMPAIGN: Event Field Value filter - Contact ID: %d, Field: %s, Operator: %s, Value: %s, Result: %s',
+                    $lead->getId(),
+                    $field,
+                    $operator,
+                    $value,
+                    $hasEvent ? 'TRUE' : 'FALSE'
+                ));
+            } catch (\Exception $e) {
+                error_log('CAMPAIGN: ' . $e->getMessage());
+                error_log('CAMPAIGN: ' . $e->getTraceAsString());
+                $event->setResult(false);
+            }
             return;
         }
 
