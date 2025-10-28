@@ -351,8 +351,12 @@ class EventContactRepository extends CommonRepository
             ->innerJoin('o.event', 'e')
             ->andWhere('o.contact = :contactId')
             ->andWhere('o.event IS NOT NULL')
-            ->andWhere('o.deleted = 0')
             ->setParameter('contactId', $contactId, ParameterType::INTEGER);
+
+        // Note: We deliberately do NOT filter by o.deleted here because:
+        // 1. When checking event fields (including event_deleted), we want to find ALL event relationships
+        // 2. The opportunity's deleted status is independent from the event's deleted status
+        // 3. Filtering by o.deleted = 0 would cause false negatives when checking event_deleted field
 
         $column = 'e.' . $field;
         $this->applyOperatorToQuery($qb, $column, $operator, $value);
@@ -366,16 +370,31 @@ class EventContactRepository extends CommonRepository
 
         $trimmedValue = is_string($value) ? trim($value) : $value;
 
+        // Special handling for boolean fields (like 'deleted')
+        // Convert string '1'/'0' to integer 1/0 for proper boolean comparison
+        $isBooleanField = str_ends_with($column, '.deleted');
+        if ($isBooleanField && in_array($trimmedValue, ['0', '1', 0, 1], true)) {
+            $trimmedValue = (int) $trimmedValue;
+        }
+
         switch ($operator) {
             case '=':
             case 'eq':
-                $qb->andWhere($column.' = :'.$parameter)
-                    ->setParameter($parameter, $trimmedValue);
+                $qb->andWhere($column.' = :'.$parameter);
+                if ($isBooleanField) {
+                    $qb->setParameter($parameter, $trimmedValue, ParameterType::INTEGER);
+                } else {
+                    $qb->setParameter($parameter, $trimmedValue);
+                }
                 break;
             case '!=':
             case 'neq':
-                $qb->andWhere('('.$column.' != :'.$parameter.' OR '.$column.' IS NULL)')
-                    ->setParameter($parameter, $trimmedValue);
+                $qb->andWhere('('.$column.' != :'.$parameter.' OR '.$column.' IS NULL)');
+                if ($isBooleanField) {
+                    $qb->setParameter($parameter, $trimmedValue, ParameterType::INTEGER);
+                } else {
+                    $qb->setParameter($parameter, $trimmedValue);
+                }
                 break;
             case 'like':
                 $qb->andWhere($column.' LIKE :'.$parameter)

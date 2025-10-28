@@ -72,8 +72,9 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
 
             // Check if value is required for this operator
+            // NOTE: Use isset() instead of empty() because '0' is a valid value (e.g., for boolean "No")
             $operatorsWithoutValue = ['empty', '!empty'];
-            if (!in_array($operator, $operatorsWithoutValue) && empty($value)) {
+            if (!in_array($operator, $operatorsWithoutValue) && !isset($config['value'])) {
                 $event->setResult(false);
                 return;
             }
